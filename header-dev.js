@@ -1,20 +1,22 @@
 // ==UserScript==
-// @name        TODO: WME Example Script
+// @name        WME Switzerland Helper
 // @namespace   wme-sdk-scripts
 // @version     1.0.0
-// @description TODO: Add a useful description here, what does your script do?
+// @description WME Switzerland Helper is a userscript that provides various tools and enhancements for Waze Map Editor (WME) users in Switzerland.
 // @updateURL	https://TODO/myscript.user.js
 // @downloadURL https://TODO/myscript.user.js
-// @author      TODO @ Waze
+// @author      Maël Pedretti (Marelitaw)
 // @match       https://www.waze.com/editor*
 // @match       https://beta.waze.com/editor*
 // @match       https://www.waze.com/*/editor*
 // @match       https://beta.waze.com/*/editor*
 // @exclude     https://www.waze.com/user/editor*
 // @exclude     https://beta.waze.com/user/editor*
-// @grant       none
-
-// @require       file:///C:/Users/[USERNAME]/Documents/MyDir/.out/main.user.js
+// @grant        GM_xmlhttpRequest
+// @grant        unsafeWindow
+// @connect      api3.geo.admin.ch
+// @connect      data.sbb.ch
+// @require      file://wsl.localhost/Debian/home/mael/opensource/waze/wme-switzerland-helper/.out/main.user.js
 // ==/UserScript==
 
 // make sure that inside Tampermonkey's extension settings (on the browser, not from TM) and allow "Local file access", as shown here: https://www.tampermonkey.net/faq.php?locale=en#Q204

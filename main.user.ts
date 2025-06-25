@@ -1,19 +1,22 @@
 import { WmeSDK } from "wme-sdk-typings";
 
 
+const scriptName = 'WME Switzerland Helper';
+
+
 // the sdk initScript function will be called after the SDK is initialized
-window.SDK_INITIALIZED.then(initScript);
+unsafeWindow.SDK_INITIALIZED.then(initScript);
 
 function initScript() {
     // initialize the sdk, these should remain here at the top of the script
-    if (!window.getWmeSdk) {
+    if (!unsafeWindow.getWmeSdk) {
         // This block is required for type checking, but it is guaranteed that the function exists.
         throw new Error("SDK not available");
     }
-    const wmeSDK: WmeSDK = window.getWmeSdk(
+    const wmeSDK: WmeSDK = unsafeWindow.getWmeSdk(
         {
             scriptId: "example-ts-id", // TODO: replace with your script id and script name
-            scriptName: "Typescript example" // TODO
+            scriptName: scriptName // TODO
         }
     )
 
@@ -62,7 +65,7 @@ function initScript() {
 
     async function addScriptTab() {
         const { tabLabel, tabPane } = await wmeSDK.Sidebar.registerScriptTab()
-        tabLabel.innerText = "Typescript Tab" // TODO
+        tabLabel.innerText = scriptName // TODO
         tabPane.innerHTML = "<h1>Typescript Tab</h1>" // TODO
     }
 
