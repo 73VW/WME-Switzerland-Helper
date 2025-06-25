@@ -1,79 +1,140 @@
 import { WmeSDK } from "wme-sdk-typings";
+import { TileLayer } from "./src/tileLayer";
+import { Layer } from "./src/layer";
+import i18next from "./locales/i18n";
 
+const englishScriptName = "WME Switzerland helper";
+let scriptName = englishScriptName;
 
 // the sdk initScript function will be called after the SDK is initialized
-window.SDK_INITIALIZED.then(initScript);
+unsafeWindow.SDK_INITIALIZED.then(initScript);
 
 function initScript() {
-    // initialize the sdk, these should remain here at the top of the script
-    if (!window.getWmeSdk) {
-        // This block is required for type checking, but it is guaranteed that the function exists.
-        throw new Error("SDK not available");
+  // initialize the sdk, these should remain here at the top of the script
+  if (!unsafeWindow.getWmeSdk) {
+    // This block is required for type checking, but it is guaranteed that the function exists.
+    throw new Error("SDK not available");
+  }
+  const wmeSDK: WmeSDK = unsafeWindow.getWmeSdk({
+    scriptId: "wme-switzerland-helper", // TODO: replace with your script id and script name
+    scriptName: englishScriptName, // TODO
+  });
+
+  console.debug(
+    `SDK v. ${wmeSDK.getSDKVersion()} on ${wmeSDK.getWMEVersion()} initialized`,
+  );
+  // --- Initialisation améliorée ---
+  const layers = new Map<string, Layer>();
+
+  function activateLanguage() {
+    const { localeCode } = wmeSDK.Settings.getLocale();
+    i18next.changeLanguage(localeCode);
+    scriptName = i18next.t("common:scriptName", englishScriptName);
+  }
+
+  function createLayers() {
+    const layerList = [
+      new TileLayer({
+        name: i18next.t(
+          "common:layers.boundaries.municipality",
+          "Municipal boundaries",
+        ),
+        tileHeight: 256,
+        tileWidth: 256,
+        fileName: "${z}/${x}/${y}.png",
+        servers: [
+          "https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.swissboundaries3d-gemeinde-flaeche.fill/default/current/3857",
+        ],
+        zIndex: 2039,
+      }),
+      new TileLayer({
+        name: i18next.t(
+          "common:layers.boundaries.state",
+          "Cantonal boundaries",
+        ),
+        tileHeight: 256,
+        tileWidth: 256,
+        fileName: "${z}/${x}/${y}.png",
+        servers: [
+          "https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.swissboundaries3d-kanton-flaeche.fill/default/current/3857",
+        ],
+        zIndex: 2038,
+      }),
+      new TileLayer({
+        name: i18next.t("common:layers.3d", "Geographical Names swissNAMES3D"),
+        tileHeight: 256,
+        tileWidth: 256,
+        fileName: "${z}/${x}/${y}.png",
+        servers: [
+          "https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.swissnames3d/default/current/3857",
+        ],
+        zIndex: 2037,
+      }),
+      new TileLayer({
+        name: i18next.t(
+          "common:layers.topo.national_colors",
+          "National Maps (color)",
+        ),
+        tileHeight: 256,
+        tileWidth: 256,
+        fileName: "${z}/${x}/${y}.jpeg",
+        servers: [
+          "https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/3857",
+        ],
+        zIndex: 2036,
+      }),
+      new TileLayer({
+        name: i18next.t(
+          "common:layers.background.swissimage",
+          "SWISSIMAGE Background",
+        ),
+        tileHeight: 256,
+        tileWidth: 256,
+        fileName: "${z}/${x}/${y}.jpeg",
+        servers: [
+          "https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.swissimage/default/current/3857",
+        ],
+      }),
+    ];
+    for (const layer of layerList) {
+      layers.set(layer.name, layer);
     }
-    const wmeSDK: WmeSDK = window.getWmeSdk(
-        {
-            scriptId: "example-ts-id", // TODO: replace with your script id and script name
-            scriptName: "Typescript example" // TODO
+  }
+
+  function registerLayerCheckboxes() {
+    for (const layer of layers.values()) {
+      layer.addCheckBox({ wmeSDK });
+    }
+  }
+
+  function registerLayerEvents() {
+    wmeSDK.Events.on({
+      eventName: "wme-layer-checkbox-toggled",
+      eventHandler: ({ name, checked }) => {
+        const layer = layers.get(name);
+        if (!layer) return;
+        if (checked) {
+          layer.addToMap({ wmeSDK });
+        } else {
+          layer.removeFromMap({ wmeSDK });
         }
-    )
+      },
+    });
+  }
 
-    console.debug(`SDK v. ${wmeSDK.getSDKVersion()} on ${wmeSDK.getWMEVersion()} initialized`)
+  async function addScriptTab() {
+    const { tabLabel, tabPane } = await wmeSDK.Sidebar.registerScriptTab();
+    tabLabel.innerText = scriptName;
+    tabPane.innerHTML = `<p>${i18next.t("common:introduction", "This script adds map layers that can be activated from the right navigation bar, at the very bottom.")}</p>`;
+  }
 
-    /* Example functions, define your functions in this section */
-    function setKeyboardShortcuts() {
-        wmeSDK.Shortcuts.createShortcut({
-            callback: () => {
-                alert("Shortcut is working!");
-            },
-            description: "typescript shortcut",
-            shortcutId: "test-shortcut-id",
-            shortcutKeys: "A+s",
-        });
-    }
+  async function init() {
+    activateLanguage();
+    createLayers();
+    registerLayerCheckboxes();
+    registerLayerEvents();
+    await addScriptTab();
+  }
 
-    function addLayer() {
-        const layer = wmeSDK.Map.addLayer({
-            layerName: "TS Layer"
-        });
-
-        wmeSDK.LayerSwitcher.addLayerCheckbox({
-            name: "TS Layer",
-        })
-
-        // Draw a feature
-        wmeSDK.Map.addFeatureToLayer(
-            {
-                layerName: "TS Layer",
-                feature: {
-                    id: "test-feature",
-                    geometry: {
-                        coordinates: [wmeSDK.Map.getMapCenter().lon, wmeSDK.Map.getMapCenter().lat],
-                        type: "Point"
-                    },
-                    type: "Feature",
-                }
-            }
-        )
-    }
-
-    function addEventListeners() {
-        // ...
-    }
-
-    async function addScriptTab() {
-        const { tabLabel, tabPane } = await wmeSDK.Sidebar.registerScriptTab()
-        tabLabel.innerText = "Typescript Tab" // TODO
-        tabPane.innerHTML = "<h1>Typescript Tab</h1>" // TODO
-    }
-
-    function init(): void {
-        // Call the functions you need to run initialize / run your script here
-        addScriptTab()
-        setKeyboardShortcuts()
-        addLayer()
-        addEventListeners()
-        alert("Your script is running! - TODO remove this line :)")
-    }
-
-    init()
+  init();
 }

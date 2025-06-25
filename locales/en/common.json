@@ -1,0 +1,17 @@
+{
+  "scriptName": "WME Switzerland Helper",
+  "layers": {
+    "boundaries": {
+      "municipality": "Municipal boundaries",
+      "state": "Cantonal boundaries"
+    },
+    "3d": "Geographical Names swissNAMES3D",
+    "topo": {
+      "national_colors": "National Maps (color)"
+    },
+    "background": {
+      "swissimage": "SWISSIMAGE Background"
+    }
+  },
+  "introduction": "This script adds map layers that can be enabled via the right navigation bar at the very bottom."
+}

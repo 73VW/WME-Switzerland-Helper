@@ -1,0 +1,17 @@
+{
+  "scriptName": "WME Schweiz Helfer",
+  "layers": {
+    "boundaries": {
+      "municipality": "Gemeindegrenzen",
+      "state": "Kantonsgrenzen"
+    },
+    "3d": "Geografische Namen swissNAMES3D",
+    "topo": {
+      "national_colors": "Landeskarten (farbig)"
+    },
+    "background": {
+      "swissimage": "SWISSIMAGE Hintergrund"
+    }
+  },
+  "introduction": "Dieses Skript fügt Kartenebenen hinzu, die über die rechte Navigationsleiste ganz unten aktiviert werden können."
+}

@@ -2,22 +2,43 @@
   "version": "1.0.0",
   "name": "wme-sdk-example",
   "devDependencies": {
+    "@eslint/js": "^9.31.0",
+    "@rollup/plugin-commonjs": "^28.0.6",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-typescript": "^12.1.0",
+    "chokidar-cli": "^3.0.0",
+    "concurrently": "^9.2.0",
+    "cross-var": "^1.1.0",
+    "eslint": "^9.31.0",
+    "globals": "^16.3.0",
+    "i18next-parser": "^9.3.0",
+    "prettier": "^3.6.2",
     "tslib": "^2.7.0",
     "typescript": "^5.6.3",
+    "typescript-eslint": "^8.37.0",
     "wme-sdk-typings": "https://web-assets.waze.com/wme_sdk_docs/production/latest/wme-sdk-typings.tgz"
   },
   "scripts": {
     "compile": "rollup -c",
-    "watch": "rollup -c --watch",
-    "concat": "cross-env concat -o releases\\release-%npm_package_version%.user.js header.js .out/main.user.js",
+    "prewatch": "npm run makemessages",
+    "watch": "concurrently \"npm run watch:rollup\" \"npm run watch:i18n\" \"npm run watch:prettier\" \"npm run watch:eslint\"",
+    "watch:rollup": "rollup -c --watch",
+    "watch:i18n": "chokidar 'src/**/*.{js,ts,jsx,tsx}' 'main.user.ts' -c \"npm run makemessages\"",
+    "watch:prettier": "chokidar 'src/**/*.{js,ts,jsx,tsx,json}' -c \"prettier --write .\"",
+    "watch:eslint": "chokidar 'src/**/*.{js,ts,jsx,tsx}' -c \"eslint . --fix\"",
+    "makemessages": "i18next",
+    "concat": "cross-var concat -o releases/release-${npm_package_version}.user.js header.js .out/main.user.js",
     "build": "npm run compile && npm run concat",
-    "release": "cross-env replace-in-files --regex='\\d+\\.\\d+\\.\\d+' --replacement=%npm_package_version% header.js && npm run build"
+    "release": "cross-var replace-in-files --regex='\\d+\\.\\d+\\.\\d+' --replacement=${npm_package_version} header.js && npm run build"
   },
   "dependencies": {
+    "@types/i18next": "^12.1.0",
     "@types/tampermonkey": "^5.0.3",
     "concat": "^1.0.3",
     "cross-env": "^7.0.3",
+    "geojson": "^0.5.0",
+    "i18next": "^25.3.2",
     "replace-in-files-cli": "^3.0.0"
   }
 }

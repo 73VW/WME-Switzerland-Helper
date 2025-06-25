@@ -1,0 +1,72 @@
+name: Release and Build UserScript
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract TAG_VERSION
+        id: extract_version
+        run: echo "tag_version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Set version in package.json from tag
+        run: |
+          jq --arg v "${{ steps.extract_version.outputs.tag_version }}" '.version=$v' package.json > package.tmp.json
+          mv package.tmp.json package.json
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install rollup globally
+        run: npm install --global rollup
+
+      - name: Build script
+        run: npm run release
+
+      - name: Rename release
+        run: |
+          cp releases/release-${{ steps.extract_version.outputs.tag_version }}.user.js releases/main.user.js
+        if: success()
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: releases/main.user.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update `releases` branch to latest tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Ensure we have all refs
+          git fetch --unshallow || true
+
+          # Create/reset the `releases` branch to current commit
+          git checkout -B releases
+
+          git add .
+
+          git commit -m "release: Userscript version ${{ steps.extract_version.outputs.tag_version }}"
+
+          # Force-push to remote `releases` branch
+          git push origin releases --force

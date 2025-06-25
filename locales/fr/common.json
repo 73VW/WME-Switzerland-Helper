@@ -1,0 +1,17 @@
+{
+  "scriptName": "WME Suisse Helper",
+  "layers": {
+    "boundaries": {
+      "municipality": "Limites de commune",
+      "state": "Limites cantonales"
+    },
+    "3d": "Noms géographiques swissNAMES3D",
+    "topo": {
+      "national_colors": "Cartes nationales (couleur)"
+    },
+    "background": {
+      "swissimage": "SWISSIMAGE Fond de plan"
+    }
+  },
+  "introduction": "Ce script ajoute des couches cartographiques qui peuvent être activées via la barre de navigation de droite tout en bas."
+}
