@@ -1,5 +1,6 @@
-// eslint-disable-next-line no-undef
-module.exports = {
+
+const parserConfig =
+{
   input: [
     "src/**/*.{js,ts,jsx,tsx}", // or wherever your source lives
     "main.user.ts",
@@ -13,3 +14,5 @@ module.exports = {
   createOldCatalogs: false,
   verbose: true,
 };
+// eslint-disable-next-line no-undef
+module.exports = parserConfig;
