@@ -68,10 +68,26 @@ Si vous avez des questions, si vous trouvez un bogue ou si vous voulez suggérer
 
 1. Rendez-vous sur le [système de suivi des problèmes du projet](https://github.com/73VW/WME-Switzerland-Helper/issues/new).
 2. Cliquez sur **"New issue "**.
-3. Remplissez le titre et décrivez votre question, votre problème ou votre idée.  
+3. Remplissez le titre et décrivez votre question, problème ou idée.  
   (Ne vous inquiétez pas si vous ne connaissez pas GitHub : vous devrez peut-être créer un compte gratuit)
 4. Soumettez votre problème. Les responsables vous répondront dès que possible.
 
 ---
 
 Merci de nous aider à améliorer Waze pour tout le monde en Suisse !
+
+## Copyright
+
+Ce projet est basé sur l'excellent travail de Francesco Bedini, qui a créé un modèle pour développer des scripts utilisateurs WME en Typescript. Vous pouvez trouver le projet original [ici](https://github.com/bedo2991/wme-typescript).
+
+Son code est sous licence MIT, disponible [ici](./LICENSE.original) au moment de la création de ce fork.
+
+Tout le code relatif au devcontainer Docker, aux paramètres VS Code, à l'utilisation des locales et au regroupement de paquets ("Tools") est également sous licence MIT.
+
+Tout le code dans `/src/` (et tout fichier avec un copyright mentionnant Maël Pedretti) est sous licence [GNU Affero General Public License v3.0 or later (AGPL)](./LICENSE).
+
+**Résumé:**
+- L'utilisation du code original reste sous la licence MIT.
+- L'utilisation du code que j'ai ajouté est restreinte par la licence AGPL telle que décrite dans la `LICENSE`.
+
+Ce projet est donc **à double licence** : des parties sous MIT (original et outils), des parties sous AGPL (tout le code `/src/` et le nouveau travail de Maël Pedretti).

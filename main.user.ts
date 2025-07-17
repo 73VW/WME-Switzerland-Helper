@@ -1,3 +1,15 @@
+/**
+ * Portions copyright (c) 2020 Francesco Bedini, MIT license.
+ * See LICENSE.original.
+ *
+ * Substantial modifications copyright (c) 2025 Maël Pedretti.
+ * These modifications are dual-licensed under the GNU AGPL v3.0 or later,
+ * but the file as a whole remains available under the original MIT license.
+ *
+ * See LICENSE.original and LICENSE for more details.
+ */
+
+
 import { WmeSDK } from "wme-sdk-typings";
 import { TileLayer } from "./src/tileLayer";
 import { Layer } from "./src/layer";

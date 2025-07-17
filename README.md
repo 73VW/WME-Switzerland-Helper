@@ -75,3 +75,19 @@ If you have questions, find a bug, or want to suggest a new feature:
 ---
 
 Thank you for helping make Waze better for everyone in Switzerland!
+
+## Copyright notice
+
+This project is based on the awesome work of Francesco Bedini, who created a template to develop WME userscripts in Typescript. You can find the original project [here](https://github.com/bedo2991/wme-typescript).
+
+His code is licensed under the MIT License, available [here](./LICENSE.original) as of the time this fork was created.
+
+All code related to the Docker devcontainer, VS Code settings, use of locales, and package bundling ("Tools") is also licensed under the MIT License.
+
+All code in `/src/` (and any file with a copyright mentioning Maël Pedretti) is licensed under the [GNU Affero General Public License v3.0 or later (AGPL)](./LICENSE).
+
+**Summary:**
+- Use of the original code remains under the MIT License.
+- Use of my added code is restricted under AGPL as described in `LICENSE`.
+
+This project is thus **dual-licensed**: portions under MIT (original and tools), portions under AGPL (all `/src/` code and new work by Maël Pedretti).

@@ -47,7 +47,7 @@ Non è necessario essere programmatori o avere particolari competenze tecniche p
 
 Con questo script, otterrete:
 
-- **Livelli di mappe ufficiali della Svizzera**
+- **Livelli di mappa ufficiali della Svizzera**
   Aggiunta e visualizzazione di livelli cartografici aggiuntivi direttamente in WME, tra cui:
   - Confini comunali svizzeri (da swisstopo)
   - Confini cantonali svizzeri (da swisstopo)
@@ -75,3 +75,19 @@ Se avete domande, trovate un bug o volete suggerire una nuova funzionalità:
 ---
 
 Grazie per aver contribuito a rendere Waze migliore per tutti in Svizzera!
+
+## Avviso di copyright
+
+Questo progetto si basa sul fantastico lavoro di Francesco Bedini, che ha creato un modello per sviluppare gli userscript di WME in Typescript. Potete trovare il progetto originale [qui](https://github.com/bedo2991/wme-typescript).
+
+Il suo codice è rilasciato sotto la Licenza MIT, disponibile [qui](./LICENSE.original) al momento della creazione di questo fork.
+
+Tutto il codice relativo al devcontainer Docker, alle impostazioni di VS Code, all'uso dei locales e al raggruppamento dei pacchetti ("Tools") è anch'esso rilasciato sotto licenza MIT.
+
+Tutto il codice in `/src/` (e qualsiasi file con una menzione di copyright a Maël Pedretti) è concesso in licenza secondo la [GNU Affero General Public License v3.0 o successiva (AGPL)](./LICENSE).
+
+**Riepilogo:**
+- L'uso del codice originale rimane sotto la Licenza MIT.
+- L'uso del codice aggiunto è limitato sotto AGPL come descritto in `LICENSE`.
+
+Questo progetto ha quindi una **doppia licenza**: porzioni sotto MIT (originale e strumenti), porzioni sotto AGPL (tutto il codice `/src/` e il nuovo lavoro di Maël Pedretti).
