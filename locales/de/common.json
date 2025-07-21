@@ -14,5 +14,5 @@
     }
   },
   "introduction": "Dieses Skript fügt Kartenebenen hinzu, die über die rechte Navigationsleiste ganz unten aktiviert werden können.",
-  "swissimageUpdateText": "Diese <a href=\"https://map.geo.admin.ch/#/map?lang=fr&center=2640688.7,1207253.47&z=1.967&topic=swisstopo&layers=ch.swisstopo.images-swissimage-dop10.metadata@features=2640_1205:2640_1204:2637_1207:2636_1207:2638_1208:2638_1207:2640_1207:2640_1206:2639_1208:2639_1207&bgLayer=ch.swisstopo.pixelkarte-farbe&featureInfo=default&catalogNodes=swisstopo\" target=\"_blank\" rel=\"noopener noreferrer\">Karte</a> zeigt, wann die ch.swisstopo.swissimage-Karte für jede Region aktualisiert wurde."
+  "swissimageUpdateText": "Diese <a href=\"https://map.geo.admin.ch/#/map?lang=fr&center=2640688.7,1207253.47&z=1.967&topic=swisstopo&layers=ch.swisstopo.images-swissimage-dop10.metadata@features=2640_1205:2640_1204:2637_1207:2636_1207:2638_1208:2638_1207:2640_1207:2640_1206:2639_1208:2639_1207&bgLayer=ch.swisstopo.pixelkarte-farbe&featureInfo=default&catalogNodes=swisstopo\" target=\"_blank\" rel=\"noopener noreferrer\">Karte</a> zeigt, wann die {{layer}}-Karte für jede Region aktualisiert wurde."
 }

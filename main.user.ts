@@ -138,7 +138,7 @@ function initScript() {
     const { tabLabel, tabPane } = await wmeSDK.Sidebar.registerScriptTab();
     tabLabel.innerText = scriptName;
     tabPane.innerHTML = `<p>${i18next.t("common:introduction", "This script adds map layers that can be activated from the right navigation bar, at the very bottom.")}</p>`;
-    tabPane.innerHTML += `<p>${i18next.t("common:swissimageUpdateText", "This <a href=\"https://map.geo.admin.ch/#/map?lang=fr&center=2640688.7,1207253.47&z=1.967&topic=swisstopo&layers=ch.swisstopo.images-swissimage-dop10.metadata@features=2640_1205:2640_1204:2637_1207:2636_1207:2638_1208:2638_1207:2640_1207:2640_1206:2639_1208:2639_1207&bgLayer=ch.swisstopo.pixelkarte-farbe&featureInfo=default&catalogNodes=swisstopo\" target=\"_blank\" rel=\"noopener noreferrer\">map</a> shows when the ch.swisstopo.swissimage map was updated for each region.")}</p>`;
+    tabPane.innerHTML += `<p>${i18next.t("common:swissimageUpdateText", { layer: i18next.t("common:layers.background.swissimage") })}</p>`;
   }
 
   async function init() {
