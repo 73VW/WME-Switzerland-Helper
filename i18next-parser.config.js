@@ -1,6 +1,4 @@
-
-const parserConfig =
-{
+const parserConfig = {
   input: [
     "src/**/*.{js,ts,jsx,tsx}", // or wherever your source lives
     "main.user.ts",

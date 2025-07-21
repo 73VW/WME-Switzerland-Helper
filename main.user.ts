@@ -9,11 +9,11 @@
  * See LICENSE.original and LICENSE for more details.
  */
 
-
 import { WmeSDK } from "wme-sdk-typings";
 import { TileLayer } from "./src/tileLayer";
 import { Layer } from "./src/layer";
 import i18next from "./locales/i18n";
+import { SidebarSection } from "./src/sidebar";
 
 const englishScriptName = "WME Switzerland helper";
 let scriptName = englishScriptName;
@@ -138,7 +138,12 @@ function initScript() {
     const { tabLabel, tabPane } = await wmeSDK.Sidebar.registerScriptTab();
     tabLabel.innerText = scriptName;
     tabPane.innerHTML = `<p>${i18next.t("common:introduction", "This script adds map layers that can be activated from the right navigation bar, at the very bottom.")}</p>`;
-    tabPane.innerHTML += `<p>${i18next.t("common:swissimageUpdateText", { layer: i18next.t("common:layers.background.swissimage") })}</p>`;
+    const noteText = `<div><p>${i18next.t("common:swissimageUpdateText", 'This <a href ="https://map.geo.admin.ch/#/map?lang=fr&center=2638909.25,1198316.5&z=1.967&topic=swisstopo&layers=ch.swisstopo.images-swissimage-dop10.metadata&bgLayer=ch.swisstopo.pixelkarte-farbe&featureInfo=default&catalogNodes=swisstopo" target="_blank" rel="noopener noreferrer">map</a> shows when the <b>{{layer}}</b> map was updated for each region.', { layer: i18next.t("common:layers.background.swissimage") })}</div></p>`;
+    tabPane.innerHTML += new SidebarSection({
+      name:
+        i18next.t("common:note.layers.background.swissimage", "Notes"),
+      icon: "w-icon-alert-info",
+    }).render({ content: noteText });
   }
 
   async function init() {
