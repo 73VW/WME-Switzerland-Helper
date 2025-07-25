@@ -55,4 +55,6 @@ npm run type-checker
 npm run release
 ```
 
+All errors must be fixed before submitting proposal. You can iterate as many times as needed.
+
 All checks must pass before Agent generated code can be merged. Agents.md helps ensure Agent follows these requirements.
