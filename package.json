@@ -41,7 +41,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@turf/turf": "^6.5.0",
+    "@turf/turf": "^7.2.0",
     "@types/i18next": "^12.1.0",
     "@types/tampermonkey": "^5.0.3",
     "concat": "^1.0.3",
