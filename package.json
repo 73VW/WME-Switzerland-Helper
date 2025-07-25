@@ -33,6 +33,7 @@
     "watch:prettier": "chokidar 'src/**/*.{js,ts,jsx,tsx,json}' -c \"prettier --write .\"",
     "watch:eslint": "chokidar 'src/**/*.{js,ts,jsx,tsx}' -c \"npm run lint\"",
     "lint": "eslint . --fix",
+    "type-checker": "tsc --noEmit",
     "translate-readme": "node translate-readme.js",
     "watch:readme": "chokidar README.md -c \"npm run translate-readme\"",
     "makemessages": "i18next",
