@@ -12,6 +12,13 @@
 import { WmeSDK } from "wme-sdk-typings";
 import { TileLayer } from "./src/tileLayer";
 import { Layer } from "./src/layer";
+import {
+  StreetLayer,
+  HouseNumberLayer,
+  PublicTransportationStopsLayer,
+  houseNumberStyleContext,
+  houseNumberStyleRules,
+} from "./src/layers";
 import i18next from "./locales/i18n";
 import { SidebarSection } from "./src/sidebar";
 
@@ -107,6 +114,28 @@ function initScript() {
           "https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.swissimage/default/current/3857",
         ],
       }),
+      new StreetLayer({
+        name: i18next.t('common:layers.streets', 'Swiss streets layer'),
+      }),
+      new HouseNumberLayer({
+        name: i18next.t('common:layers.houseNumbers', 'Swiss house numbers'),
+        styleContext: houseNumberStyleContext(),
+        styleRules: houseNumberStyleRules,
+      }),
+      new PublicTransportationStopsLayer({
+        name: i18next.t('common:layers.publicTransport', 'Public transportation stops'),
+        styleRules: [
+          {
+            style: {
+              fillOpacity: 1,
+              cursor: 'pointer',
+              pointRadius: 13,
+              externalGraphic:
+                'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OSIgaGVpZ2h0PSI0OCIgZmlsbD0iYmxhY2siPjxjaXJjbGUgY3g9IjI0LjcyNiIgY3k9IjI0IiByPSIyMyIgZmlsbD0iI2U2N2UyMiIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMjkuNzI2IDE0YTMgMyAwIDAgMSAyLjk5NSAyLjgyNGwuMDA1LjE3NnYxaDEuMDE3bC4xNS4wMDVjLjkzOC4wNiAxLjc2LjY4NCAxLjg0MyAxLjU5MWwuMDA3LjE1NFYyMmwtLjAwNy4xMTdhMSAxIDAgMCAxLS44NzYuODc2bC0uMTE3LjAwNy0uMTE3LS4wMDdhMSAxIDAgMCAxLS44NzYtLjg3NkwzMy43NDMgMjJ2LTJoLTEuMDE3djEwYTEgMSAwIDAgMS0uODgzLjk5M2wtLjExNy4wMDdoLTF2MS41YTEuNSAxLjUgMCAwIDEtMyAwVjMxaC02djEuNWExLjUgMS41IDAgMCAxLTMgMFYzMWgtMWExIDEgMCAwIDEtLjk5My0uODgzTDE2LjcyNiAzMFYyMGgtMXYyYTEgMSAwIDAgMS0uODgzLjk5M2wtLjExNy4wMDdhMSAxIDAgMCAxLS45OTMtLjg4M0wxMy43MjYgMjJ2LTIuMjVjMC0uOTkuODYtMS42ODIgMS44NS0xLjc0NWwuMTUtLjAwNWgxdi0xYTMgMyAwIDAgMSAyLjgyNC0yLjk5NWwuMTc2LS4wMDV6bS0xIDEzaC0xYTEgMSAwIDEgMCAwIDJoMWExIDEgMCAxIDAgMC0ybS03IDBoLTFhMSAxIDAgMSAwIDAgMmgxYTEgMSAwIDEgMCAwLTJtLS40MjktMTFoLTEuNTdsLS4xMTcuMDA3YTEgMSAwIDAgMC0uODc3Ljg3NmwtLjAwNy4xMTd2OGgxMnYtOGwtLjAwNy0uMTE3YTEgMSAwIDAgMC0uNzY0LS44NTdsLS4xMTItLjAyLS4xMTctLjAwNmgtMS41NzJsLS44NTQgMS40OTYtLjA2NS4xYTEgMSAwIDAgMS0uODAzLjQwNEgyMy4wMmwtLjExOS0uMDA3YTEgMSAwIDAgMS0uNzUtLjQ5N3oiLz48c2NyaXB0IHhtbG5zPSIiLz48L3N2Zz4=',
+            },
+          },
+        ],
+      }),
     ];
     for (const layer of layerList) {
       layers.set(layer.name, layer);
@@ -138,12 +167,14 @@ function initScript() {
     const { tabLabel, tabPane } = await wmeSDK.Sidebar.registerScriptTab();
     tabLabel.innerText = scriptName;
     tabPane.innerHTML = `<p>${i18next.t("common:introduction", "This script adds map layers that can be activated from the right navigation bar, at the very bottom.")}</p>`;
+    tabPane.innerHTML += `<p><a href="https://www.waze-switzerland.ch/editing/local-rules-guidelines" target="_blank" rel="noopener">${i18next.t('common:guidelines', 'Swiss mapping guidelines')}</a></p>`;
     const noteText = `<div><p>${i18next.t("common:swissimageUpdateText", 'This <a href ="https://map.geo.admin.ch/#/map?lang=fr&center=2638909.25,1198316.5&z=1.967&topic=swisstopo&layers=ch.swisstopo.images-swissimage-dop10.metadata&bgLayer=ch.swisstopo.pixelkarte-farbe&featureInfo=default&catalogNodes=swisstopo" target="_blank" rel="noopener noreferrer">map</a> shows when the <b>{{layer}}</b> map was updated for each region.', { layer: i18next.t("common:layers.background.swissimage") })}</div></p>`;
     tabPane.innerHTML += new SidebarSection({
       name:
         i18next.t("common:note.layers.background.swissimage", "Notes"),
       icon: "w-icon-alert-info",
     }).render({ content: noteText });
+    tabPane.innerHTML += `<p>${i18next.t('common:houseNumberNote','Due to a bug, house numbers are always displayed')}</p>`;
   }
 
   async function init() {
