@@ -35,8 +35,8 @@ export class HouseNumberLayer extends SwissMapGeoAdminLayer<HouseNumberRecord> {
     };
   }
 
-  async featureClicked({ wmeSDK, featureId }: { wmeSDK: WmeSDK; featureId: string }) {
-    const feature = this.features.get(parseInt(featureId, 10));
+  async featureClicked({ wmeSDK, featureId }: { wmeSDK: WmeSDK; featureId: string | number }) {
+    const feature = this.features.get(parseInt(String(featureId), 10));
     if (!feature) return;
     wmeSDK.DataModel.HouseNumbers.addHouseNumber({
       number: feature.attributes.adr_number,

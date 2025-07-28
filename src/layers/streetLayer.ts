@@ -55,8 +55,8 @@ export class StreetLayer extends SwissMapGeoAdminLayer<StreetRecord> {
     return [];
   }
 
-  async featureClicked({ wmeSDK, featureId }: { wmeSDK: WmeSDK; featureId: string }) {
-    const [baseId] = featureId.split('-');
+  async featureClicked({ wmeSDK, featureId }: { wmeSDK: WmeSDK; featureId: string | number }) {
+    const [baseId] = String(featureId).split('-');
     const feature = this.features.get(parseInt(baseId, 10));
     if (!feature) return;
     if (!feature.geometry?.rings) return;

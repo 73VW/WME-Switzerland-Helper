@@ -129,7 +129,7 @@ export class PublicTransportationStopsLayer extends FeatureLayer<StopRecord> {
     }
   }
 
-  async featureClicked({ wmeSDK, featureId }: { wmeSDK: WmeSDK; featureId: string }) {
+  async featureClicked({ wmeSDK, featureId }: { wmeSDK: WmeSDK; featureId: string | number }) {
     const stop = this.features.get(featureId);
     if (!stop) return;
     const lat = parseFloat(stop.geopos_haltestelle.lat);
