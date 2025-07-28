@@ -1,10 +1,11 @@
 import { Layer } from '../layer';
-import { WmeSDK } from 'wme-sdk-typings';
+import type { WmeSDK } from 'wme-sdk-typings';
 
-export abstract class FeatureLayer extends Layer {
+
+export abstract class FeatureLayer<TRecord> extends Layer {
   styleContext?: Record<string, unknown>;
   styleRules?: unknown[];
-  features = new Map<number | string, any>();
+  features = new Map<number | string, TRecord>();
   minZoomLevel = 15;
 
   constructor(args: { name: string; styleContext?: Record<string, unknown>; styleRules?: unknown[] }) {
@@ -17,8 +18,10 @@ export abstract class FeatureLayer extends Layer {
     const { wmeSDK } = args;
     wmeSDK.Map.addLayer({
       layerName: this.name,
-      styleContext: this.styleContext,
-      styleRules: this.styleRules,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      styleContext: this.styleContext as any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      styleRules: this.styleRules as any,
     });
     await this.render({ wmeSDK });
   }
@@ -38,6 +41,7 @@ export abstract class FeatureLayer extends Layer {
         this.addRecordToFeatures({ record });
         if (await this.shouldDrawRecord({ wmeSDK, record })) {
           const features = this.mapRecordToFeature({ record });
+          if (!features) continue;
           const wazeFeatures = Array.isArray(features) ? features : [features];
           wmeSDK.Map.addFeaturesToLayer({ features: wazeFeatures, layerName: this.name });
         }
@@ -45,9 +49,14 @@ export abstract class FeatureLayer extends Layer {
     }
   }
 
-  abstract addRecordToFeatures(args: { record: any }): void;
-  abstract mapRecordToFeature(args: { record: any }): any | any[];
-  abstract shouldDrawRecord(args: { wmeSDK: WmeSDK; record: any }): Promise<boolean>;
-  abstract fetchData(args: { wmeSDK: WmeSDK }): AsyncGenerator<any[]>;
-  abstract featureClicked?(args: { wmeSDK: WmeSDK; featureId: string }): Promise<void>;
+  abstract addRecordToFeatures(args: { record: TRecord }): void;
+  abstract mapRecordToFeature(args: { record: TRecord }): unknown | unknown[] | null;
+  abstract shouldDrawRecord(args: { wmeSDK: WmeSDK; record: TRecord }): Promise<boolean>;
+  abstract fetchData(args: { wmeSDK: WmeSDK }): AsyncGenerator<TRecord[]>;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async featureClicked(_args: { wmeSDK: WmeSDK; featureId: string }): Promise<void> {
+    // optional hook
+  }
 }
+
+

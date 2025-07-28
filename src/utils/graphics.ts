@@ -48,3 +48,4 @@ export function svgToBase64(svgString: string): string {
   const binary = Array.from(utf8Bytes, (b) => String.fromCharCode(b)).join('');
   return `data:image/svg+xml;base64,${btoa(binary)}`;
 }
+
