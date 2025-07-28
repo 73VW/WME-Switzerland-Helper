@@ -11,9 +11,13 @@
     },
     "background": {
       "swissimage": "SWISSIMAGE Fond de plan"
-    }
+    },
+    "streets": "Couches des rues suisses",
+    "houseNumbers": "Numéros de maison suisses",
+    "publicTransport": "Arrêts de transports publics"
   },
   "introduction": "Ce script ajoute des couches cartographiques qui peuvent être activées via la barre de navigation de droite tout en bas.",
+  "guidelines": "Règles d'édition suisses",
   "swissimageUpdateText": "Cette <a href=\"https://map.geo.admin.ch/#/map?lang=fr&center=2638909.25,1198316.5&z=1.967&topic=swisstopo&layers=ch.swisstopo.images-swissimage-dop10.metadata&bgLayer=ch.swisstopo.pixelkarte-farbe&featureInfo=default&catalogNodes=swisstopo\" target=\"_blank\" rel=\"noopener noreferrer\">carte</a> indique quand la couche <b>{{layer}}</b> a été mise à jour pour chaque région.",
   "note": {
     "layers": {
@@ -21,5 +25,6 @@
         "swissimage": "Notes"
       }
     }
-  }
+  },
+  "houseNumberNote": "En raison d'un bug, les numéros sont toujours affichés"
 }

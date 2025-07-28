@@ -1,0 +1,19 @@
+import { segmentsCrossingPolygon } from '../src/utils/geometry';
+
+const square = [[[0,0],[4,0],[4,4],[0,4],[0,0]]];
+
+interface Segment {
+  geometry: { coordinates: number[][] };
+  id: number;
+}
+
+const segments: Segment[] = [
+  { geometry: { coordinates: [[-1, 2], [5, 2]] }, id: 1 }, // crosses
+  { geometry: { coordinates: [[1, 1], [3, 3]] }, id: 2 }, // inside
+  { geometry: { coordinates: [[-1, -1], [-2, -2]] }, id: 3 }, // outside
+];
+
+test('segmentsCrossingPolygon filters correctly', () => {
+  const res = segmentsCrossingPolygon(square, segments);
+  expect(res.map((s) => s.id)).toEqual([1, 2]);
+});
