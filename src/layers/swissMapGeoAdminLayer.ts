@@ -1,12 +1,12 @@
 import { FeatureLayer } from './featureLayer';
-import { WmeSDK } from 'wme-sdk-typings';
+import type { WmeSDK } from 'wme-sdk-typings';
 
-export abstract class SwissMapGeoAdminLayer extends FeatureLayer {
+export abstract class SwissMapGeoAdminLayer<TRecord> extends FeatureLayer<TRecord> {
   maxRecordsPerPage = 201;
   baseUrl = 'https://api3.geo.admin.ch/rest/services/api/MapServer/identify?geometryType=esriGeometryEnvelope&imageDisplay=0,0,0&mapExtent=0,0,0,0&tolerance=0&sr=4326';
   layer = '';
 
-  async *fetchData({ wmeSDK, offset = 0 }: { wmeSDK: WmeSDK; offset?: number }): AsyncGenerator<any[]> {
+  async *fetchData({ wmeSDK, offset = 0 }: { wmeSDK: WmeSDK; offset?: number }): AsyncGenerator<TRecord[]> {
     const mapExtent = wmeSDK.Map.getMapExtent();
     const url = `${this.baseUrl}&layers=all:${this.layer}&offset=${offset}&geometry=${mapExtent.join(',')}`;
     const response = await GM.xmlHttpRequest({ method: 'GET', url, responseType: 'json' });
@@ -17,3 +17,5 @@ export abstract class SwissMapGeoAdminLayer extends FeatureLayer {
     }
   }
 }
+
+
