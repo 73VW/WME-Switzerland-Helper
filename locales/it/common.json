@@ -17,6 +17,7 @@
     "publicTransport": "Fermate del trasporto pubblico"
   },
   "introduction": "Questo script aggiunge livelli di mappa che possono essere attivati tramite la barra di navigazione a destra in basso.",
+  "guidelines": "Linee guida svizzere",
   "swissimageUpdateText": "Questa <a href=\"https://map.geo.admin.ch/#/map?lang=fr&center=2638909.25,1198316.5&z=1.967&topic=swisstopo&layers=ch.swisstopo.images-swissimage-dop10.metadata&bgLayer=ch.swisstopo.pixelkarte-farbe&featureInfo=default&catalogNodes=swisstopo\" target=\"_blank\" rel=\"noopener noreferrer\">mappa</a> mostra quando il layer <b>{{layer}}</b> è stato aggiornato per ogni regione.",
   "note": {
     "layers": {
@@ -25,6 +26,5 @@
       }
     }
   },
-  "guidelines": "Linee guida svizzere",
   "houseNumberNote": "A causa di un bug, i numeri civici sono sempre mostrati"
 }

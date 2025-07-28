@@ -23,7 +23,7 @@
     "tslib": "^2.7.0",
     "typescript": "^5.6.3",
     "typescript-eslint": "^8.37.0",
-    "wme-sdk-typings": "https://web-assets.waze.com/wme_sdk_docs/production/latest/wme-sdk-typings.tgz"
+    "wme-sdk-typings": "https://web-assets.waze.com/wme_sdk_docs/beta/latest/wme-sdk-typings.tgz"
   },
   "scripts": {
     "compile": "rollup -c",
