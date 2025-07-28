@@ -1,4 +1,4 @@
-import { lineString, polygon, point, Feature, LineString, Polygon } from '@turf/helpers';
+import { lineString, polygon, point } from '@turf/helpers';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import booleanPointOnLine from '@turf/boolean-point-on-line';
 import lineIntersect from '@turf/line-intersect';
@@ -9,10 +9,10 @@ export function normalizeStreetName(str: string): string {
   return str.toLowerCase().replace(/-/g, ' ').trim();
 }
 
-export function segmentsCrossingPolygon(
+export function segmentsCrossingPolygon<T extends { geometry: { coordinates: number[][] } }>(
   polyCoords: number[][][],
-  segments: { geometry: { coordinates: number[][] } }[],
-) {
+  segments: T[],
+): T[] {
   const poly = polygon(polyCoords);
   const polyBbox = bbox(poly);
   return segments.filter((seg) => {
@@ -46,7 +46,6 @@ export function segmentsCrossingPolygon(
     const endInside = booleanPointInPolygon(end, poly);
     const linePoly = lineString(poly.geometry.coordinates[0]);
     const startOnEdge = booleanPointOnLine(start, linePoly);
-    const endOnEdge = booleanPointOnLine(end, linePoly);
     const intersections = lineIntersect(line, poly).features.length > 0;
 
     if (!startInside && !endInside) return intersections;
