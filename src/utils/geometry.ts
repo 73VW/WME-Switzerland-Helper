@@ -79,3 +79,19 @@ export function haversineDistance(
   return R * c;
 }
 
+
+export function segmentPolygonIntersections(
+  polyCoords: number[][][],
+  lineCoords: number[][],
+): number[][] {
+  const poly = polygon(polyCoords);
+  const line = lineString(lineCoords);
+  return lineIntersect(line, poly).features.map((f) => {
+    const coords = f.geometry.coordinates as number[];
+    return [coords[0], coords[1]];
+  });
+}
+
+export function pointsAreClose(a: number[], b: number[], tol = 1e-6): boolean {
+  return Math.abs(a[0] - b[0]) < tol && Math.abs(a[1] - b[1]) < tol;
+}

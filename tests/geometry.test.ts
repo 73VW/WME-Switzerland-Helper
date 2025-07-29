@@ -22,3 +22,14 @@ test('haversineDistance gives reasonable result', () => {
   const dist = haversineDistance(0, 0, 0, 1);
   expect(Math.round(dist)).toBe(111195);
 });
+import { segmentPolygonIntersections } from '../src/utils/geometry';
+
+test('segmentPolygonIntersections returns boundary points', () => {
+  const ints = segmentPolygonIntersections(square, segments[0].geometry.coordinates);
+  expect(ints).toEqual([
+    [0, 2],
+    [4, 2],
+  ]);
+  const inside = segmentPolygonIntersections(square, segments[1].geometry.coordinates);
+  expect(inside.length).toBe(0);
+});

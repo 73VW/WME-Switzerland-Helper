@@ -1,7 +1,12 @@
 import { SwissMapGeoAdminLayer } from './swissMapGeoAdminLayer';
 
 import type { WmeSDK, Segment } from 'wme-sdk-typings';
-import { normalizeStreetName, segmentsCrossingPolygon } from '../utils/geometry';
+import {
+  normalizeStreetName,
+  segmentsCrossingPolygon,
+  segmentPolygonIntersections,
+  pointsAreClose,
+} from '../utils/geometry';
 
 interface StreetRecord {
   id: number;
@@ -65,11 +70,45 @@ export class StreetLayer extends SwissMapGeoAdminLayer<StreetRecord> {
     return [];
   }
 
+  private splitSegmentsByPolygon(wmeSDK: WmeSDK, poly: number[][][]) {
+    const seen = new Set<number>();
+    let changed = true;
+    while (changed) {
+      changed = false;
+      const segments: Segment[] = wmeSDK.DataModel.Segments.getAll()
+        .filter((s) => s.toNodeId && s.fromNodeId)
+        .filter((s) => !this.ROAD_TYPES_TO_AVOID.includes(s.roadType));
+
+      const relevant = segmentsCrossingPolygon(poly, segments);
+
+      for (const seg of relevant) {
+        if (seen.has(seg.id)) continue;
+        const coords = seg.geometry.coordinates as number[][];
+        const inters = segmentPolygonIntersections(poly, coords).filter(
+          (pt) =>
+            !pointsAreClose(pt, coords[0]) &&
+            !pointsAreClose(pt, coords[coords.length - 1])
+        );
+        if (inters.length > 0) {
+          wmeSDK.DataModel.Segments.splitSegment({
+            segmentId: seg.id,
+            splitPoint: { coordinates: inters[0], type: 'Point' },
+          });
+          changed = true;
+          break;
+        }
+        seen.add(seg.id);
+      }
+    }
+  }
+
   async featureClicked({ wmeSDK, featureId }: { wmeSDK: WmeSDK; featureId: string | number }) {
     const [baseId] = String(featureId).split('-');
     const feature = this.features.get(parseInt(baseId, 10));
     if (!feature) return;
     if (!feature.geometry?.rings) return;
+
+    this.splitSegmentsByPolygon(wmeSDK, feature.geometry.rings);
 
     const segments: Segment[] = wmeSDK.DataModel.Segments.getAll()
       .filter((s) => s.toNodeId && s.fromNodeId)
