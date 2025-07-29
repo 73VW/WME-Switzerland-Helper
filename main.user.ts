@@ -16,6 +16,8 @@ import {
   StreetLayer,
   HouseNumberLayer,
   PublicTransportationStopsLayer,
+  streetStyleContext,
+  streetStyleRules,
   houseNumberStyleContext,
   houseNumberStyleRules,
 } from "./src/layers";
@@ -117,6 +119,8 @@ function initScript() {
       }),
       new StreetLayer({
         name: i18next.t('common:layers.streets', 'Swiss streets layer'),
+        styleContext: streetStyleContext(),
+        styleRules: streetStyleRules,
       }),
       new HouseNumberLayer({
         name: i18next.t('common:layers.houseNumbers', 'Swiss house numbers'),

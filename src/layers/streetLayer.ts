@@ -14,17 +14,27 @@ export class StreetLayer extends SwissMapGeoAdminLayer<StreetRecord> {
   ROAD_TYPES_TO_AVOID = [15, 3, 6, 7, 2, 18, 4, 19];
 
   async shouldDrawRecord({ wmeSDK, record }: { wmeSDK: WmeSDK; record: StreetRecord }): Promise<boolean> {
+    // If the feature contains paths (lines), always draw them to allow creating segments.
+    if (record.geometry?.paths) return true;
+
+    // For polygon features, only draw when at least one existing segment within
+    // the polygon has a different street name or when no segment exists.
     if (!record.geometry?.rings) return false;
+
     const segments: Segment[] = wmeSDK.DataModel.Segments.getAll()
       .filter((s) => s.toNodeId && s.fromNodeId)
       .filter((s) => !this.ROAD_TYPES_TO_AVOID.includes(s.roadType));
 
     const relevant = segmentsCrossingPolygon(record.geometry.rings, segments);
     if (relevant.length === 0) return false;
+
     for (const seg of relevant) {
       const addr = wmeSDK.DataModel.Segments.getAddress({ segmentId: seg.id });
       if (!addr || !addr.street) return true;
-      if (normalizeStreetName(addr.street.name ?? '') !== normalizeStreetName(record.attributes.stn_label)) {
+      if (
+        normalizeStreetName(addr.street.name ?? '') !==
+        normalizeStreetName(record.attributes.stn_label)
+      ) {
         return true;
       }
     }
@@ -85,4 +95,36 @@ export class StreetLayer extends SwissMapGeoAdminLayer<StreetRecord> {
     wmeSDK.Map.removeFeatureFromLayer({ layerName: this.name, featureId });
   }
 }
+
+export function streetStyleContext() {
+  return {
+    getStrokeColor: ({ feature }: { feature?: unknown; zoomLevel: number }) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const f: any = feature;
+      return f?.geometry?.type === 'LineString' ? 'red' : 'blue';
+    },
+    getLabel: ({ feature }: { feature?: unknown; zoomLevel: number }) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const f: any = feature;
+      return f?.properties?.label;
+    },
+  };
+}
+
+export const streetStyleRules = [
+  {
+    style: {
+      strokeColor: '${getStrokeColor}',
+      strokeWidth: 3,
+      title: '${getLabel}',
+      pointerEvents: 'all',
+      label: '${getLabel}',
+      cursor: 'pointer',
+      labelSelect: true,
+      labelAlign: 'cm',
+      strokeDashstyle: 'dash',
+    },
+  },
+];
+
 
