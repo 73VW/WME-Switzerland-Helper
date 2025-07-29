@@ -16,9 +16,12 @@ import {
   StreetLayer,
   HouseNumberLayer,
   PublicTransportationStopsLayer,
+  streetStyleContext,
+  streetStyleRules,
   houseNumberStyleContext,
   houseNumberStyleRules,
 } from "./src/layers";
+import { FeatureLayer } from "./src/layers/featureLayer";
 import i18next from "./locales/i18n";
 import { SidebarSection } from "./src/sidebar";
 
@@ -116,6 +119,8 @@ function initScript() {
       }),
       new StreetLayer({
         name: i18next.t('common:layers.streets', 'Swiss streets layer'),
+        styleContext: streetStyleContext(),
+        styleRules: streetStyleRules,
       }),
       new HouseNumberLayer({
         name: i18next.t('common:layers.houseNumbers', 'Swiss house numbers'),
@@ -158,6 +163,25 @@ function initScript() {
           layer.addToMap({ wmeSDK });
         } else {
           layer.removeFromMap({ wmeSDK });
+        }
+      },
+    });
+    wmeSDK.Events.on({
+      eventName: "wme-layer-feature-clicked",
+      eventHandler: async ({ featureId, layerName }) => {
+        const layer = layers.get(layerName);
+        if (layer instanceof FeatureLayer) {
+          await layer.featureClicked({ wmeSDK, featureId });
+        }
+      },
+    });
+    wmeSDK.Events.on({
+      eventName: "wme-map-move-end",
+      eventHandler: () => {
+        for (const layer of layers.values()) {
+          if (layer instanceof FeatureLayer) {
+            layer.render({ wmeSDK });
+          }
         }
       },
     });

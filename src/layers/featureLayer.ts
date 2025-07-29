@@ -23,6 +23,9 @@ export abstract class FeatureLayer<TRecord> extends Layer {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       styleRules: this.styleRules as any,
     });
+    if (this.featureClicked !== FeatureLayer.prototype.featureClicked) {
+      wmeSDK.Events.trackLayerEvents({ layerName: this.name });
+    }
     await this.render({ wmeSDK });
   }
 
@@ -54,7 +57,7 @@ export abstract class FeatureLayer<TRecord> extends Layer {
   abstract shouldDrawRecord(args: { wmeSDK: WmeSDK; record: TRecord }): Promise<boolean>;
   abstract fetchData(args: { wmeSDK: WmeSDK }): AsyncGenerator<TRecord[]>;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async featureClicked(_args: { wmeSDK: WmeSDK; featureId: string }): Promise<void> {
+  async featureClicked(_args: { wmeSDK: WmeSDK; featureId: string | number }): Promise<void> {
     // optional hook
   }
 }
