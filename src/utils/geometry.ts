@@ -15,6 +15,7 @@ export function segmentsCrossingPolygon<T extends { geometry: { coordinates: num
 ): T[] {
   const poly = polygon(polyCoords);
   const polyBbox = bbox(poly);
+  const edge = lineString(poly.geometry.coordinates[0]);
   return segments.filter((seg) => {
     const coords = seg.geometry.coordinates;
     const line = lineString(coords);
@@ -44,16 +45,11 @@ export function segmentsCrossingPolygon<T extends { geometry: { coordinates: num
     const end = point(coords[coords.length - 1]);
     const startInside = booleanPointInPolygon(start, poly);
     const endInside = booleanPointInPolygon(end, poly);
-    const linePoly = lineString(poly.geometry.coordinates[0]);
-    const startOnEdge = booleanPointOnLine(start, linePoly);
-    const intersections = lineIntersect(line, poly).features.length > 0;
+    const startOnEdge = booleanPointOnLine(start, edge);
+    const endOnEdge = booleanPointOnLine(end, edge);
+    const intersects = lineIntersect(line, poly).features.length > 0;
 
-    if (!startInside && !endInside) return intersections;
-    if (startOnEdge && !endInside) return intersections;
-    if (!startInside && endInside) return true;
-    if (startOnEdge && endInside) return true;
-    if (startInside && endInside) return true;
-    return false;
+    return startInside || endInside || startOnEdge || endOnEdge || intersects;
   });
 }
 
