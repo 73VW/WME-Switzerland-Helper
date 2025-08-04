@@ -82,7 +82,7 @@ const segments: Segment[] = [
 
 test('segmentsCrossingPolygon filters correctly', () => {
   const res = segmentsCrossingPolygon(square, segments);
-  expect(res.map((s) => s.id)).toEqual([1, 3, 4, 5, 6]);
+  expect(res.map((s) => s.id)).toEqual([1, 3, 6]);
 });
 
 test('segmentsCrossingOrInsidePolygon filters correctly', () => {

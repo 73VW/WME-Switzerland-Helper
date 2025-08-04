@@ -4,6 +4,7 @@ import type { WmeSDK, Segment } from 'wme-sdk-typings';
 import {
   normalizeStreetName,
   segmentsCrossingPolygon,
+  segmentsCrossingOrInsidePolygon,
   segmentPolygonIntersections,
   pointsAreClose,
 } from '../utils/geometry';
@@ -30,7 +31,7 @@ export class StreetLayer extends SwissMapGeoAdminLayer<StreetRecord> {
       .filter((s) => s.toNodeId && s.fromNodeId)
       .filter((s) => !this.ROAD_TYPES_TO_AVOID.includes(s.roadType));
 
-    const relevant = segmentsCrossingPolygon(record.geometry.rings, segments);
+    const relevant = segmentsCrossingOrInsidePolygon(record.geometry.rings, segments);
     if (relevant.length === 0) return false;
 
     for (const seg of relevant) {
@@ -78,9 +79,6 @@ export class StreetLayer extends SwissMapGeoAdminLayer<StreetRecord> {
       const segments: Segment[] = wmeSDK.DataModel.Segments.getAll()
         .filter((s) => s.toNodeId && s.fromNodeId)
         .filter((s) => !this.ROAD_TYPES_TO_AVOID.includes(s.roadType));
-      console.log(segments);
-      console.log(poly);
-      debugger;
 
       const relevant = segmentsCrossingPolygon(poly, segments);
 
@@ -116,7 +114,7 @@ export class StreetLayer extends SwissMapGeoAdminLayer<StreetRecord> {
     const segments: Segment[] = wmeSDK.DataModel.Segments.getAll()
       .filter((s) => s.toNodeId && s.fromNodeId)
       .filter((s) => !this.ROAD_TYPES_TO_AVOID.includes(s.roadType));
-    const relevant = segmentsCrossingPolygon(feature.geometry.rings, segments);
+    const relevant = segmentsCrossingOrInsidePolygon(feature.geometry.rings, segments);
 
     const street = wmeSDK.DataModel.Streets.getAll().find(
       (st) => normalizeStreetName(st.name ?? '') === normalizeStreetName(feature.attributes.stn_label),

@@ -13,31 +13,23 @@ export function segmentsCrossingOrInsidePolygon<T extends { geometry: { coordina
   polyCoords: number[][][],
   segments: T[],
 ): T[] {
-  // TODO: Implement logic to determine which segments need to be updated based on the polygon coordinates.
-  return []
-}
-
-export function segmentsCrossingPolygon<T extends { geometry: { coordinates: number[][] } }>(
-  polyCoords: number[][][],
-  segments: T[],
-): T[] {
   const poly = polygon(polyCoords);
   const polyBbox = bbox(poly);
   const edge = lineString(poly.geometry.coordinates[0]);
+  const bbPoly = polygon([
+    [
+      [polyBbox[0], polyBbox[1]],
+      [polyBbox[2], polyBbox[1]],
+      [polyBbox[2], polyBbox[3]],
+      [polyBbox[0], polyBbox[3]],
+      [polyBbox[0], polyBbox[1]],
+    ],
+  ]);
+
   return segments.filter((seg) => {
     const coords = seg.geometry.coordinates;
     const line = lineString(coords);
     const segBbox = bbox(line);
-    // quick bbox check
-    const bbPoly = polygon([
-      [
-        [polyBbox[0], polyBbox[1]],
-        [polyBbox[2], polyBbox[1]],
-        [polyBbox[2], polyBbox[3]],
-        [polyBbox[0], polyBbox[3]],
-        [polyBbox[0], polyBbox[1]],
-      ],
-    ]);
     const bbLine = polygon([
       [
         [segBbox[0], segBbox[1]],
@@ -55,9 +47,65 @@ export function segmentsCrossingPolygon<T extends { geometry: { coordinates: num
     const endInside = booleanPointInPolygon(end, poly);
     const startOnEdge = booleanPointOnLine(start, edge);
     const endOnEdge = booleanPointOnLine(end, edge);
-    const intersects = lineIntersect(line, poly).features.length > 0;
 
-    return startInside || endInside || startOnEdge || endOnEdge || intersects;
+    return (startInside || startOnEdge) && (endInside || endOnEdge);
+  });
+}
+
+export function segmentsCrossingPolygon<T extends { geometry: { coordinates: number[][] } }>(
+  polyCoords: number[][][],
+  segments: T[],
+): T[] {
+  const poly = polygon(polyCoords);
+  const polyBbox = bbox(poly);
+  const edge = lineString(poly.geometry.coordinates[0]);
+  const bbPoly = polygon([
+    [
+      [polyBbox[0], polyBbox[1]],
+      [polyBbox[2], polyBbox[1]],
+      [polyBbox[2], polyBbox[3]],
+      [polyBbox[0], polyBbox[3]],
+      [polyBbox[0], polyBbox[1]],
+    ],
+  ]);
+
+  return segments.filter((seg) => {
+    const coords = seg.geometry.coordinates;
+    const line = lineString(coords);
+    const segBbox = bbox(line);
+    const bbLine = polygon([
+      [
+        [segBbox[0], segBbox[1]],
+        [segBbox[2], segBbox[1]],
+        [segBbox[2], segBbox[3]],
+        [segBbox[0], segBbox[3]],
+        [segBbox[0], segBbox[1]],
+      ],
+    ]);
+    if (booleanDisjoint(bbPoly, bbLine)) return false;
+
+    const start = point(coords[0]);
+    const end = point(coords[coords.length - 1]);
+    const startInside = booleanPointInPolygon(start, poly);
+    const endInside = booleanPointInPolygon(end, poly);
+    const startOnEdge = booleanPointOnLine(start, edge);
+    const endOnEdge = booleanPointOnLine(end, edge);
+
+    // if both endpoints are inside or on the edge, the segment does not cross
+    if ((startInside || startOnEdge) && (endInside || endOnEdge)) {
+      return false;
+    }
+
+    const intersections = lineIntersect(line, poly).features.filter(
+      (f) =>
+        !pointsAreClose(f.geometry.coordinates as number[], coords[0]) &&
+        !pointsAreClose(
+          f.geometry.coordinates as number[],
+          coords[coords.length - 1],
+        ),
+    );
+
+    return intersections.length > 0;
   });
 }
 
