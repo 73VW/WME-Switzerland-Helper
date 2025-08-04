@@ -9,6 +9,14 @@ export function normalizeStreetName(str: string): string {
   return str.toLowerCase().replace(/-/g, ' ').trim();
 }
 
+export function segmentsCrossingOrInsidePolygon<T extends { geometry: { coordinates: number[][] } }>(
+  polyCoords: number[][][],
+  segments: T[],
+): T[] {
+  // TODO: Implement logic to determine which segments need to be updated based on the polygon coordinates.
+  return []
+}
+
 export function segmentsCrossingPolygon<T extends { geometry: { coordinates: number[][] } }>(
   polyCoords: number[][][],
   segments: T[],
@@ -68,7 +76,7 @@ export function haversineDistance(
   const a =
     Math.sin(dLat / 2) ** 2 +
     Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) ** 2;
+    Math.sin(dLon / 2) ** 2;
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 

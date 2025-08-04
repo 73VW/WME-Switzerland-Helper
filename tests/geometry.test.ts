@@ -1,4 +1,4 @@
-import { segmentsCrossingPolygon, haversineDistance } from '../src/utils/geometry';
+import { segmentsCrossingPolygon, haversineDistance, segmentsCrossingOrInsidePolygon } from '../src/utils/geometry';
 
 const square = [[
   [0, 0],
@@ -83,6 +83,11 @@ const segments: Segment[] = [
 test('segmentsCrossingPolygon filters correctly', () => {
   const res = segmentsCrossingPolygon(square, segments);
   expect(res.map((s) => s.id)).toEqual([1, 3, 4, 5, 6]);
+});
+
+test('segmentsCrossingOrInsidePolygon filters correctly', () => {
+  const res = segmentsCrossingOrInsidePolygon(square, segments);
+  expect(res.map((s) => s.id)).toEqual([4, 5, 8]);
 });
 
 test('haversineDistance gives reasonable result', () => {

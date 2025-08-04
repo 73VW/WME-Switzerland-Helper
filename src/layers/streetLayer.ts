@@ -78,6 +78,9 @@ export class StreetLayer extends SwissMapGeoAdminLayer<StreetRecord> {
       const segments: Segment[] = wmeSDK.DataModel.Segments.getAll()
         .filter((s) => s.toNodeId && s.fromNodeId)
         .filter((s) => !this.ROAD_TYPES_TO_AVOID.includes(s.roadType));
+      console.log(segments);
+      console.log(poly);
+      debugger;
 
       const relevant = segmentsCrossingPolygon(poly, segments);
 
