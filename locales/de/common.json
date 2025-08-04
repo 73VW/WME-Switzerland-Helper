@@ -11,9 +11,13 @@
     },
     "background": {
       "swissimage": "SWISSIMAGE Hintergrund"
-    }
+    },
+    "streets": "Schweizer Straßenlayer",
+    "houseNumbers": "Schweizer Hausnummern",
+    "publicTransport": "Haltestellen des öffentlichen Verkehrs"
   },
   "introduction": "Dieses Skript fügt Kartenebenen hinzu, die über die rechte Navigationsleiste ganz unten aktiviert werden können.",
+  "guidelines": "Schweizer Bearbeitungsrichtlinien",
   "swissimageUpdateText": "Diese <a href=\"https://map.geo.admin.ch/#/map?lang=fr&center=2638909.25,1198316.5&z=1.967&topic=swisstopo&layers=ch.swisstopo.images-swissimage-dop10.metadata&bgLayer=ch.swisstopo.pixelkarte-farbe&featureInfo=default&catalogNodes=swisstopo\" target=\"_blank\" rel=\"noopener noreferrer\">Karte</a> zeigt, wann die <b>{{layer}}</b>-Karte für jede Region aktualisiert wurde.",
   "note": {
     "layers": {
@@ -21,5 +25,6 @@
         "swissimage": "Hinweise"
       }
     }
-  }
+  },
+  "houseNumberNote": "Aufgrund eines Fehlers werden Hausnummern immer angezeigt"
 }
