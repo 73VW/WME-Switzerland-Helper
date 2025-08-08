@@ -1,6 +1,6 @@
 import { SwissMapGeoAdminLayer } from './swissMapGeoAdminLayer';
 
-import type { WmeSDK, Segment } from 'wme-sdk-typings';
+import type { WmeSDK, Segment, Street, City, Country } from 'wme-sdk-typings';
 import {
   normalizeStreetName,
   segmentsCrossingPolygon,
@@ -12,7 +12,7 @@ import {
 interface StreetRecord {
   id: number;
   geometry?: { rings?: number[][][]; paths?: number[][][] };
-  attributes: { stn_label: string; label?: string };
+  attributes: { stn_label: string; label?: string, zip_label: string };
 }
 
 export class StreetLayer extends SwissMapGeoAdminLayer<StreetRecord> {
@@ -111,27 +111,55 @@ export class StreetLayer extends SwissMapGeoAdminLayer<StreetRecord> {
 
     this.splitSegmentsByPolygon(wmeSDK, feature.geometry.rings);
 
-    const segments: Segment[] = wmeSDK.DataModel.Segments.getAll()
+    const allSegments = wmeSDK.DataModel.Segments.getAll();
+
+    const segments: Segment[] = allSegments
       .filter((s) => s.toNodeId && s.fromNodeId)
       .filter((s) => !this.ROAD_TYPES_TO_AVOID.includes(s.roadType));
+
     const relevant = segmentsCrossingOrInsidePolygon(feature.geometry.rings, segments);
+    const ids = relevant.map((v) => v.id);
 
-    const street = wmeSDK.DataModel.Streets.getAll().find(
-      (st) => normalizeStreetName(st.name ?? '') === normalizeStreetName(feature.attributes.stn_label),
-    );
+    let country: Country | undefined | null = null;
+    country = wmeSDK.DataModel.Countries.getTopCountry();
+    if (!country) {
+      country = wmeSDK.DataModel.Countries.getAll().find(c => c.name === 'Switzerland');
+    }
 
+
+    const zipLabel = feature.attributes.zip_label;
+    const cityName = zipLabel.slice(zipLabel.indexOf(" ") + 1);
+    const city = wmeSDK.DataModel.Cities.getCity({ cityName: cityName, countryId: country?.id });
+    let street: Street | null | undefined = null;
+    try {
+      street = wmeSDK.DataModel.Streets.getStreet({ streetName: feature.attributes.stn_label, cityId: city?.id });
+    } catch (e) {
+      // If the street does not exist, we will create it later.
+      // This is to avoid creating a street with the same name multiple times.
+      console.debug(`Street not found: ${feature.attributes.stn_label}`, e);
+    }
+    if (!street) {
+      // If the street does not exist, create it.
+      street = wmeSDK.DataModel.Streets.addStreet({
+        streetName: feature.attributes.stn_label,
+        cityId: city?.id,
+      });
+    }
+
+    // Try to update the address of all segments crossing or inside the polygon
+    // to the street name of the polygon.
     for (const seg of relevant) {
       const addr = wmeSDK.DataModel.Segments.getAddress({ segmentId: seg.id });
-      if (!addr) continue;
-      let s = street;
-      if (!s) {
-        if (!addr.city) continue;
-        s = wmeSDK.DataModel.Streets.addStreet({ streetName: feature.attributes.stn_label, cityId: addr.city.id });
-      }
-      if (addr.street?.id !== s.id) {
-        wmeSDK.DataModel.Segments.updateAddress({ segmentId: seg.id, primaryStreetId: s.id });
+      if (!addr.street || (addr.street?.id !== street.id)) {
+        wmeSDK.DataModel.Segments.updateAddress({ segmentId: seg.id, primaryStreetId: street.id });
       }
     }
+    wmeSDK.Editing.setSelection({
+      selection: {
+        ids: ids,
+        objectType: "segment",
+      },
+    });
     wmeSDK.Map.removeFeatureFromLayer({ layerName: this.name, featureId });
   }
 }

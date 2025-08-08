@@ -9,7 +9,7 @@ export function normalizeStreetName(str: string): string {
   return str.toLowerCase().replace(/-/g, ' ').trim();
 }
 
-export function segmentsCrossingOrInsidePolygon<T extends { geometry: { coordinates: number[][] } }>(
+export function segmentsCrossingOrInsidePolygon<T extends { geometry: { coordinates: number[][] }, id: number }>(
   polyCoords: number[][][],
   segments: T[],
 ): T[] {
@@ -39,16 +39,19 @@ export function segmentsCrossingOrInsidePolygon<T extends { geometry: { coordina
         [segBbox[0], segBbox[1]],
       ],
     ]);
-    if (booleanDisjoint(bbPoly, bbLine)) return false;
+    const isDisjoint = booleanDisjoint(bbPoly, bbLine);
+    if (isDisjoint) return false;
 
     const start = point(coords[0]);
     const end = point(coords[coords.length - 1]);
     const startInside = booleanPointInPolygon(start, poly);
     const endInside = booleanPointInPolygon(end, poly);
-    const startOnEdge = booleanPointOnLine(start, edge);
-    const endOnEdge = booleanPointOnLine(end, edge);
+    const startOnEdge = booleanPointOnLine(start, edge, { epsilon: 1e-8 });
+    const endOnEdge = booleanPointOnLine(end, edge, { epsilon: 1e-8 });
 
-    return (startInside || startOnEdge) && (endInside || endOnEdge);
+    const result = (startInside || startOnEdge) && (endInside || endOnEdge);
+
+    return result;
   });
 }
 
