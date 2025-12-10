@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name        WME Switzerland Helper
+// @name        WME Switzerland Helper Dev
 // @namespace   wme-sdk-scripts
 // @version     1.0.0
 // @description WME Switzerland Helper is a userscript that provides various tools and enhancements for Waze Map Editor (WME) users in Switzerland.
@@ -16,7 +16,7 @@
 // @grant        unsafeWindow
 // @connect      api3.geo.admin.ch
 // @connect      data.sbb.ch
-// @require		file://wsl.localhost/Debian/home/mael/opensource/waze/wme-switzerland-helper/.out/main.user.js
+// @require		file://wsl.localhost/Debian/home/mael/opensource/WME-Switzerland-Helper/.out/main.user.js
 // ==/UserScript==
 
 // make sure that inside Tampermonkey's extension settings (on the browser, not from TM) and allow "Local file access", as shown here: https://www.tampermonkey.net/faq.php?locale=en#Q204

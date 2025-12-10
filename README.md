@@ -26,20 +26,23 @@ You don’t need to be a programmer or have any special technical skills to use 
 ## 🛠️ How to Install and Use
 
 1. **Install Tampermonkey**  
-  Tampermonkey is a free browser extension that lets you add helpful scripts to websites.  
-  - [Get Tampermonkey for Chrome](https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
-  - For other browsers, search for "Tampermonkey" in your browser’s extension/add-on store.
+   Tampermonkey is a free browser extension that lets you add helpful scripts to websites.
 
-2. **Add the WME Switzerland Helper Script**  
-  - After installing Tampermonkey, click this link:  
-    [Install WME Switzerland Helper](https://raw.githubusercontent.com/73VW/WME-Switzerland-Helper/releases/releases/main.user.js)
-  - Your browser will show a page asking if you want to install the script. Click the <kbd>Install</kbd> button.
+- [Get Tampermonkey for Chrome](https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
+- For other browsers, search for "Tampermonkey" in your browser’s extension/add-on store.
 
-3. **Start Editing!**  
-  - Open the [Waze Map Editor](https://www.waze.com/editor?tab=userscript_tab).
-  - You’ll see new options and a short explanation in the `Scripts` tab.
+2. **Add the WME Switzerland Helper Script**
 
-*That’s it! The script runs automatically when you use the Waze Map Editor.*
+- After installing Tampermonkey, click this link:  
+  [Install WME Switzerland Helper](https://raw.githubusercontent.com/73VW/WME-Switzerland-Helper/releases/releases/main.user.js)
+- Your browser will show a page asking if you want to install the script. Click the <kbd>Install</kbd> button.
+
+3. **Start Editing!**
+
+- Open the [Waze Map Editor](https://www.waze.com/editor?tab=userscript_tab).
+- You’ll see new options and a short explanation in the `Scripts` tab.
+
+_That’s it! The script runs automatically when you use the Waze Map Editor._
 
 ---
 
@@ -69,7 +72,7 @@ If you have questions, find a bug, or want to suggest a new feature:
 1. Go to the [project’s issue tracker](https://github.com/73VW/WME-Switzerland-Helper/issues/new).
 2. Click on **"New issue"**.
 3. Fill in the title and describe your question, problem, or idea.  
-  (Don’t worry if you’re new to GitHub—you may need to create a free account.)
+   (Don’t worry if you’re new to GitHub—you may need to create a free account.)
 4. Submit your issue. The maintainers will get back to you as soon as possible.
 
 ---
@@ -87,6 +90,7 @@ All code related to the Docker devcontainer, VS Code settings, use of locales, a
 All code in `/src/` (and any file with a copyright mentioning Maël Pedretti) is licensed under the [GNU Affero General Public License v3.0 or later (AGPL)](./LICENSE).
 
 **Summary:**
+
 - Use of the original code remains under the MIT License.
 - Use of my added code is restricted under AGPL as described in `LICENSE`.
 

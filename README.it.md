@@ -26,20 +26,23 @@ Non è necessario essere programmatori o avere particolari competenze tecniche p
 ## 🛠️ Come installare e utilizzare
 
 1. **Installare Tampermonkey**
-  Tampermonkey è un'estensione gratuita del browser che consente di aggiungere script utili ai siti web.  
-  - [Ottenere Tampermonkey per Chrome](https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
-  - Per altri browser, cercate "Tampermonkey" nel negozio di estensioni/add-on del vostro browser.
+   Tampermonkey è un'estensione gratuita del browser che consente di aggiungere script utili ai siti web.
+
+- [Ottenere Tampermonkey per Chrome](https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
+- Per altri browser, cercate "Tampermonkey" nel negozio di estensioni/add-on del vostro browser.
 
 2. **Aggiungi il WME Switzerland Helper Script**
-  - Dopo aver installato Tampermonkey, fare clic su questo link:  
-    [Installare WME Switzerland Helper](https://raw.githubusercontent.com/73VW/WME-Switzerland-Helper/releases/releases/main.user.js)
-  - Il browser mostrerà una pagina che chiede se si desidera installare lo script. Fare clic sul pulsante <kbd>Installa</kbd>.
 
-3. **Iniziare a modificare!
-  - Aprite il [Waze Map Editor](https://www.waze.com/editor?tab=userscript_tab).
-  - Vedrete nuove opzioni e una breve spiegazione nella scheda `Scripts`.
+- Dopo aver installato Tampermonkey, fare clic su questo link:  
+  [Installare WME Switzerland Helper](https://raw.githubusercontent.com/73VW/WME-Switzerland-Helper/releases/releases/main.user.js)
+- Il browser mostrerà una pagina che chiede se si desidera installare lo script. Fare clic sul pulsante <kbd>Installa</kbd>.
 
-*Ecco fatto! Lo script viene eseguito automaticamente quando si utilizza l'Editor mappe di Waze.*
+3. \*\*Iniziare a modificare!
+
+- Aprite il [Waze Map Editor](https://www.waze.com/editor?tab=userscript_tab).
+- Vedrete nuove opzioni e una breve spiegazione nella scheda `Scripts`.
+
+_Ecco fatto! Lo script viene eseguito automaticamente quando si utilizza l'Editor mappe di Waze._
 
 ---
 
@@ -69,7 +72,7 @@ Se avete domande, trovate un bug o volete suggerire una nuova funzionalità:
 1. Andate al [issue tracker del progetto](https://github.com/73VW/WME-Switzerland-Helper/issues/new).
 2. Cliccare su **"Nuovo problema "**.
 3. Compilare il titolo e descrivere la domanda, il problema o l'idea.  
-  (Non preoccupatevi se siete nuovi su GitHub: potrebbe essere necessario creare un account gratuito)
+   (Non preoccupatevi se siete nuovi su GitHub: potrebbe essere necessario creare un account gratuito)
 4. Invia il tuo problema. I manutentori vi risponderanno al più presto.
 
 ---
@@ -87,6 +90,7 @@ Tutto il codice relativo al devcontainer Docker, alle impostazioni di VS Code, a
 Tutto il codice in `/src/` (e qualsiasi file con una menzione di copyright a Maël Pedretti) è concesso in licenza secondo la [GNU Affero General Public License v3.0 o successiva (AGPL)](./LICENSE).
 
 **Riepilogo:**
+
 - L'uso del codice originale rimane sotto la Licenza MIT.
 - L'uso del codice aggiunto è limitato sotto AGPL come descritto in `LICENSE`.
 
