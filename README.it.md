@@ -57,11 +57,25 @@ Con questo script, otterrete:
   - Nomi geografici (swissNAMES3D)
   - Carte nazionali svizzere a colori
   - Immagini aeree svizzere ad alta risoluzione
+  - Fermate del trasporto pubblico
 
 - **Controlli facili per i livelli**
   Attivate o disattivate ogni livello con semplici caselle di controllo nell'interfaccia di WME.
 
 Tutti i dati cartografici provengono da fonti ufficiali svizzere (swisstopo), quindi potete fidarvi della loro accuratezza.
+
+### Come funziona il livello delle fermate dei trasporti pubblici
+
+Il livello **Fermate dei trasporti pubblici** mostra le fermate ufficiali del trasporto pubblico dal database delle Ferrovie federali svizzere (SBB). Ecco cosa dovete sapere:
+
+- **Indicatore visivo**: Le fermate appaiono come **icone circolari arancioni** sulla mappa
+- **Abbinamento intelligente**: Lo script controlla automaticamente la presenza di location all'interno di un raggio di **75 metri** per evitare duplicati
+- **Deduplicazione**: Se una location già esiste con lo stesso nome e tipo entro **5 metri**, non verrà disegnata sulla mappa (per evitare marcatori sovrapposti)
+- **Cliccate per aggiungere**: Quando fate clic su un marcatore di fermata, potete:
+  - Creare una nuova location se non ne esiste nessuna nelle vicinanze
+  - Fonderla con una location esistente con lo stesso nome
+  - Aggiornare le coordinate della location esistente
+- **Tipi supportati**: Il livello include fermate per autobus, tram, treni, barche e funivie in tutta la Svizzera
 
 ---
 

@@ -57,11 +57,25 @@ With this script, you get:
   - Geographic names (swissNAMES3D)
   - Swiss national color maps
   - High-resolution Swiss aerial imagery
+  - Public transport stops
 
 - **Easy Layer Controls**  
   Turn each layer on or off with simple checkboxes in the WME interface.
 
 All map data comes from official Swiss sources (swisstopo), so you can trust its accuracy.
+
+### How the Public Transport Stops Layer Works
+
+The **Public Transport Stops** layer displays official public transport stops from the Swiss Federal Railways (SBB) database. Here's what you need to know:
+
+- **Visual Indicator**: Stops appear as **orange circular icons** on the map
+- **Smart Matching**: The script automatically checks for existing venues within a **75-meter radius** to avoid duplicates
+- **Deduplication**: If a venue already exists with the same name and type within **5 meters**, it won't be drawn on the map (to prevent overlapping markers)
+- **Click to Add**: When you click a stop marker, you can:
+  - Create a new venue if none exists nearby
+  - Merge it with an existing venue with the same name
+  - Update existing venue coordinates
+- **Types Supported**: The layer includes stops for buses, trams, trains, boats, and cable cars across Switzerland
 
 ---
 

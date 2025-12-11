@@ -57,11 +57,25 @@ Avec ce script, vous obtenez :
   - Noms géographiques (swissNAMES3D)
   - Cartes nationales suisses en couleur
   - Images aériennes suisses à haute résolution
+  - Arrêts de transports publics
 
 - **Contrôle facile des couches**
   Activez ou désactivez chaque couche à l'aide de simples cases à cocher dans l'interface de WME.
 
 Toutes les données cartographiques proviennent de sources officielles suisses (swisstopo), vous pouvez donc vous fier à leur exactitude.
+
+### Fonctionnement de la couche des arrêts de transports publics
+
+La couche **Arrêts de transports publics** affiche les arrêts de transport en commun officiels de la base de données des Chemins de fer fédéraux suisses (CFF). Voici ce que vous devez savoir :
+
+- **Indicateur visuel** : Les arrêts apparaissent sous forme d'**icônes circulaires orange** sur la carte
+- **Correspondance intelligente** : Le script vérifie automatiquement l'existence de lieux dans un rayon de **75 mètres** pour éviter les doublons
+- **Dédoublonnage** : Si un lieu existe déjà avec le même nom et le même type dans un rayon de **5 mètres**, il ne sera pas affiché sur la carte (pour éviter les marqueurs qui se chevauchent)
+- **Cliquez pour ajouter** : En cliquant sur un marqueur d'arrêt, vous pouvez :
+  - Créer un nouveau lieu s'il n'en existe aucun à proximité
+  - Le fusionner avec un lieu existant portant le même nom
+  - Mettre à jour les coordonnées du lieu existant
+- **Types pris en charge** : La couche inclut les arrêts de bus, tramways, trains, bateaux et remontées mécaniques en Suisse
 
 ---
 

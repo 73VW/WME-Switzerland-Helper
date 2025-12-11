@@ -57,11 +57,25 @@ Mit diesem Skript erhalten Sie:
   - Geografische Namen (swissNAMES3D)
   - Farbige Landeskarten der Schweiz
   - Hochauflösendes Schweizer Luftbildmaterial
+  - Haltestellen des öffentlichen Nahverkehrs
 
 - **Einfache Layer-Steuerung**
   Schalten Sie jede Ebene mit einfachen Kontrollkästchen in der WME-Oberfläche ein oder aus.
 
 Alle Kartendaten stammen aus offiziellen Schweizer Quellen (swisstopo), so dass Sie auf ihre Genauigkeit vertrauen können.
+
+### Funktionsweise der Haltestellen-Ebene des öffentlichen Nahverkehrs
+
+Die Ebene **Haltestellen des öffentlichen Nahverkehrs** zeigt offizielle Haltestellen des öffentlichen Verkehrs aus der Datenbank der Schweizer Bundesbahnen (SBB) an. Das sollten Sie wissen:
+
+- **Visueller Indikator**: Haltestellen erscheinen als **orangefarbene Kreissymbole** auf der Karte
+- **Intelligente Zuordnung**: Das Skript prüft automatisch auf vorhandene Orte im Umkreis von **75 Metern**, um Duplikate zu vermeiden
+- **Deduplizierung**: Wenn an einem Ort bereits ein Venue mit demselben Namen und Typ im Umkreis von **5 Metern** vorhanden ist, wird es auf der Karte nicht angezeigt (um überlagernde Markierungen zu vermeiden)
+- **Klicken zum Hinzufügen**: Wenn Sie auf ein Haltestellen-Marker klicken, können Sie:
+  - Ein neues Venue erstellen, wenn keines in der Nähe existiert
+  - Es mit einem vorhandenen Venue mit demselben Namen zusammenführen
+  - Vorhandene Venue-Koordinaten aktualisieren
+- **Unterstützte Typen**: Die Ebene umfasst Haltestellen für Busse, Straßenbahnen, Züge, Boote und Seilbahnen in der ganzen Schweiz
 
 ---
 
