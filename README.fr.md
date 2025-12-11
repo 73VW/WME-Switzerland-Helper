@@ -26,20 +26,23 @@ Vous n'avez pas besoin d'être un programmeur ou d'avoir des compétences techni
 ## 🛠️ Comment installer et utiliser
 
 1. **Installer Tampermonkey**
-  Tampermonkey est une extension de navigateur gratuite qui vous permet d'ajouter des scripts utiles aux sites web.  
-  - [Télécharger Tampermonkey pour Chrome](https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
-  - Pour les autres navigateurs, recherchez "Tampermonkey" dans le magasin d'extensions de votre navigateur.
+   Tampermonkey est une extension de navigateur gratuite qui vous permet d'ajouter des scripts utiles aux sites web.
+
+- [Télécharger Tampermonkey pour Chrome](https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
+- Pour les autres navigateurs, recherchez "Tampermonkey" dans le magasin d'extensions de votre navigateur.
 
 2. **Ajouter le script d'aide de WME Switzerland**
-  - Après avoir installé Tampermonkey, cliquez sur ce lien :  
-    [Installer WME Switzerland Helper](https://raw.githubusercontent.com/73VW/WME-Switzerland-Helper/releases/releases/main.user.js)
-  - Votre navigateur affichera une page vous demandant si vous souhaitez installer le script. Cliquez sur le bouton <kbd>Install</kbd>.
+
+- Après avoir installé Tampermonkey, cliquez sur ce lien :  
+  [Installer WME Switzerland Helper](https://raw.githubusercontent.com/73VW/WME-Switzerland-Helper/releases/releases/main.user.js)
+- Votre navigateur affichera une page vous demandant si vous souhaitez installer le script. Cliquez sur le bouton <kbd>Install</kbd>.
 
 3. **Commencez à éditer!**
-  - Ouvrez le [Waze Map Editor](https://www.waze.com/editor?tab=userscript_tab).
-  - Vous verrez de nouvelles options et une courte explication dans l'onglet `Scripts`.
 
-*Et voilà ! Le script s'exécute automatiquement lorsque vous utilisez l'éditeur de cartes Waze.*
+- Ouvrez le [Waze Map Editor](https://www.waze.com/editor?tab=userscript_tab).
+- Vous verrez de nouvelles options et une courte explication dans l'onglet `Scripts`.
+
+_Et voilà ! Le script s'exécute automatiquement lorsque vous utilisez l'éditeur de cartes Waze._
 
 ---
 
@@ -54,11 +57,25 @@ Avec ce script, vous obtenez :
   - Noms géographiques (swissNAMES3D)
   - Cartes nationales suisses en couleur
   - Images aériennes suisses à haute résolution
+  - Arrêts de transports publics
 
 - **Contrôle facile des couches**
   Activez ou désactivez chaque couche à l'aide de simples cases à cocher dans l'interface de WME.
 
 Toutes les données cartographiques proviennent de sources officielles suisses (swisstopo), vous pouvez donc vous fier à leur exactitude.
+
+### Fonctionnement de la couche des arrêts de transports publics
+
+La couche **Arrêts de transports publics** affiche les arrêts de transport en commun officiels de la base de données des Chemins de fer fédéraux suisses (CFF). Voici ce que vous devez savoir :
+
+- **Indicateur visuel** : Les arrêts apparaissent sous forme d'**icônes circulaires orange** sur la carte
+- **Correspondance intelligente** : Le script vérifie automatiquement l'existence de lieux dans un rayon de **75 mètres** pour éviter les doublons
+- **Dédoublonnage** : Si un lieu existe déjà avec le même nom et le même type dans un rayon de **5 mètres**, il ne sera pas affiché sur la carte (pour éviter les marqueurs qui se chevauchent)
+- **Cliquez pour ajouter** : En cliquant sur un marqueur d'arrêt, vous pouvez :
+  - Créer un nouveau lieu s'il n'en existe aucun à proximité
+  - Le fusionner avec un lieu existant portant le même nom
+  - Mettre à jour les coordonnées du lieu existant
+- **Types pris en charge** : La couche inclut les arrêts de bus, tramways, trains, bateaux et remontées mécaniques en Suisse
 
 ---
 
@@ -69,7 +86,7 @@ Si vous avez des questions, si vous trouvez un bogue ou si vous voulez suggérer
 1. Rendez-vous sur le [système de suivi des problèmes du projet](https://github.com/73VW/WME-Switzerland-Helper/issues/new).
 2. Cliquez sur **"New issue "**.
 3. Remplissez le titre et décrivez votre question, problème ou idée.  
-  (Ne vous inquiétez pas si vous ne connaissez pas GitHub : vous devrez peut-être créer un compte gratuit)
+   (Ne vous inquiétez pas si vous ne connaissez pas GitHub : vous devrez peut-être créer un compte gratuit)
 4. Soumettez votre problème. Les responsables vous répondront dès que possible.
 
 ---
@@ -87,6 +104,7 @@ Tout le code relatif au devcontainer Docker, aux paramètres VS Code, à l'utili
 Tout le code dans `/src/` (et tout fichier avec un copyright mentionnant Maël Pedretti) est sous licence [GNU Affero General Public License v3.0 or later (AGPL)](./LICENSE).
 
 **Résumé:**
+
 - L'utilisation du code original reste sous la licence MIT.
 - L'utilisation du code que j'ai ajouté est restreinte par la licence AGPL telle que décrite dans la `LICENSE`.
 

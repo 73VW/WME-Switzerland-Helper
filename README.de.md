@@ -26,20 +26,23 @@ Sie müssen kein Programmierer sein oder besondere technische Fähigkeiten haben
 ## 🛠️ Installation und Verwendung
 
 1. **Tampermonkey installieren**
-  Tampermonkey ist eine kostenlose Browsererweiterung, mit der Sie hilfreiche Skripte zu Websites hinzufügen können.  
-  - [Tampermonkey für Chrome herunterladen](https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
-  - Bei anderen Browsern suchen Sie im Erweiterungs-/Add-on-Store Ihres Browsers nach "Tampermonkey".
+   Tampermonkey ist eine kostenlose Browsererweiterung, mit der Sie hilfreiche Skripte zu Websites hinzufügen können.
+
+- [Tampermonkey für Chrome herunterladen](https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
+- Bei anderen Browsern suchen Sie im Erweiterungs-/Add-on-Store Ihres Browsers nach "Tampermonkey".
 
 2. **Hinzufügen des WME Switzerland Helper Script**
-  - Nachdem Sie Tampermonkey installiert haben, klicken Sie auf diesen Link:  
-    [WME Switzerland Helper installieren](https://raw.githubusercontent.com/73VW/WME-Switzerland-Helper/releases/releases/main.user.js)
-  - Ihr Browser wird eine Seite anzeigen, auf der Sie gefragt werden, ob Sie das Skript installieren möchten. Klicken Sie auf die Schaltfläche <kbd>Installieren</kbd>.
 
-3. **Start Editing!*
-  - Öffnen Sie den [Waze Map Editor](https://www.waze.com/editor?tab=userscript_tab).
-  - Auf der Registerkarte "Skripte" sehen Sie neue Optionen und eine kurze Erklärung.
+- Nachdem Sie Tampermonkey installiert haben, klicken Sie auf diesen Link:  
+  [WME Switzerland Helper installieren](https://raw.githubusercontent.com/73VW/WME-Switzerland-Helper/releases/releases/main.user.js)
+- Ihr Browser wird eine Seite anzeigen, auf der Sie gefragt werden, ob Sie das Skript installieren möchten. Klicken Sie auf die Schaltfläche <kbd>Installieren</kbd>.
 
-*Das war's! Das Skript wird automatisch ausgeführt, wenn Sie den Waze Map Editor verwenden
+3. \*_Start Editing!_
+
+- Öffnen Sie den [Waze Map Editor](https://www.waze.com/editor?tab=userscript_tab).
+- Auf der Registerkarte "Skripte" sehen Sie neue Optionen und eine kurze Erklärung.
+
+\*Das war's! Das Skript wird automatisch ausgeführt, wenn Sie den Waze Map Editor verwenden
 
 ---
 
@@ -54,11 +57,25 @@ Mit diesem Skript erhalten Sie:
   - Geografische Namen (swissNAMES3D)
   - Farbige Landeskarten der Schweiz
   - Hochauflösendes Schweizer Luftbildmaterial
+  - Haltestellen des öffentlichen Nahverkehrs
 
 - **Einfache Layer-Steuerung**
   Schalten Sie jede Ebene mit einfachen Kontrollkästchen in der WME-Oberfläche ein oder aus.
 
 Alle Kartendaten stammen aus offiziellen Schweizer Quellen (swisstopo), so dass Sie auf ihre Genauigkeit vertrauen können.
+
+### Funktionsweise der Haltestellen-Ebene des öffentlichen Nahverkehrs
+
+Die Ebene **Haltestellen des öffentlichen Nahverkehrs** zeigt offizielle Haltestellen des öffentlichen Verkehrs aus der Datenbank der Schweizer Bundesbahnen (SBB) an. Das sollten Sie wissen:
+
+- **Visueller Indikator**: Haltestellen erscheinen als **orangefarbene Kreissymbole** auf der Karte
+- **Intelligente Zuordnung**: Das Skript prüft automatisch auf vorhandene Orte im Umkreis von **75 Metern**, um Duplikate zu vermeiden
+- **Deduplizierung**: Wenn an einem Ort bereits ein Venue mit demselben Namen und Typ im Umkreis von **5 Metern** vorhanden ist, wird es auf der Karte nicht angezeigt (um überlagernde Markierungen zu vermeiden)
+- **Klicken zum Hinzufügen**: Wenn Sie auf ein Haltestellen-Marker klicken, können Sie:
+  - Ein neues Venue erstellen, wenn keines in der Nähe existiert
+  - Es mit einem vorhandenen Venue mit demselben Namen zusammenführen
+  - Vorhandene Venue-Koordinaten aktualisieren
+- **Unterstützte Typen**: Die Ebene umfasst Haltestellen für Busse, Straßenbahnen, Züge, Boote und Seilbahnen in der ganzen Schweiz
 
 ---
 
@@ -69,7 +86,7 @@ Wenn Sie Fragen haben, einen Fehler finden oder eine neue Funktion vorschlagen m
 1. Gehen Sie zum [Issue Tracker des Projekts](https://github.com/73VW/WME-Switzerland-Helper/issues/new).
 2. Klicken Sie auf **"Neues Problem "**.
 3. Füllen Sie den Titel aus und beschreiben Sie Ihre Frage, Ihr Problem oder Ihre Idee.  
-  (Keine Sorge, wenn Sie neu auf GitHub sind - Sie müssen möglicherweise ein kostenloses Konto erstellen)
+   (Keine Sorge, wenn Sie neu auf GitHub sind - Sie müssen möglicherweise ein kostenloses Konto erstellen)
 4. Reichen Sie Ihr Problem ein. Die Betreuer werden sich so schnell wie möglich bei Ihnen melden.
 
 ---
@@ -87,6 +104,7 @@ Der gesamte Code im Zusammenhang mit dem Docker Devcontainer, den VS-Code-Einste
 Der gesamte Code in `/src/` (und jede Datei mit einem Copyright-Vermerk auf Maël Pedretti) steht unter der [GNU Affero General Public License v3.0 oder später (AGPL)](./LICENSE).
 
 **Zusammenfassung:**
+
 - Die Verwendung des ursprünglichen Codes steht unter der MIT-Lizenz.
 - Die Verwendung des von mir hinzugefügten Codes unterliegt den Einschränkungen der AGPL, wie in `LICENSE` beschrieben.
 
