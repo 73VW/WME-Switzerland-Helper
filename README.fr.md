@@ -93,6 +93,25 @@ Si vous avez des questions, si vous trouvez un bogue ou si vous voulez suggérer
 
 Merci de nous aider à améliorer Waze pour tout le monde en Suisse !
 
+---
+
+## 📝 Changelog
+
+### v1.2.1
+- 💾 L'état des cases des couches est conservé entre les rechargements
+- ⚡ Rendu plus rapide : seules les nouveautés/suppressions sont appliquées
+
+### v1.2.0
+- 🚏 Couche Arrêts de transport public avec gestion du clic
+
+### v1.1.0
+- 🗺️ Ajout de l'overlay swissNAMES3D
+
+### v1.0.0
+- 🎉 Première version avec limites communales/cantonales et fonds nationaux
+
+---
+
 ## Copyright
 
 Ce projet est basé sur l'excellent travail de Francesco Bedini, qui a créé un modèle pour développer des scripts utilisateurs WME en Typescript. Vous pouvez trouver le projet original [ici](https://github.com/bedo2991/wme-typescript).

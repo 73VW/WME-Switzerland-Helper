@@ -93,6 +93,25 @@ Wenn Sie Fragen haben, einen Fehler finden oder eine neue Funktion vorschlagen m
 
 Vielen Dank, dass Sie helfen, Waze für alle in der Schweiz besser zu machen!
 
+---
+
+## 📝 Changelog
+
+### v1.2.1
+- 💾 Layer-Kontrollkästchen bleiben über Reloads erhalten
+- ⚡ Schnelleres Rendering; nur neue/entfernte Elemente werden aktualisiert
+
+### v1.2.0
+- 🚏 Layer für ÖV-Haltestellen mit Klick-Handling
+
+### v1.1.0
+- 🗺️ swissNAMES3D-Overlay hinzugefügt
+
+### v1.0.0
+- 🎉 Erste Version mit Gemeinde-/Kantonsgrenzen und nationalen Kartenkacheln
+
+---
+
 ## Copyright-Hinweis
 
 Dieses Projekt basiert auf der großartigen Arbeit von Francesco Bedini, der eine Vorlage zur Entwicklung von WME-Benutzerskripten in Typescript erstellt hat. Das Originalprojekt finden Sie [hier](https://github.com/bedo2991/wme-typescript).

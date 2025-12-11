@@ -93,6 +93,25 @@ Se avete domande, trovate un bug o volete suggerire una nuova funzionalità:
 
 Grazie per aver contribuito a rendere Waze migliore per tutti in Svizzera!
 
+---
+
+## 📝 Changelog
+
+### v1.2.1
+- 💾 Stato delle caselle dei livelli conservato tra i reload
+- ⚡ Rendering più veloce; si aggiornano solo elementi nuovi/rimossi
+
+### v1.2.0
+- 🚏 Layer Fermate trasporto pubblico con gestione del click
+
+### v1.1.0
+- 🗺️ Aggiunto overlay swissNAMES3D
+
+### v1.0.0
+- 🎉 Prima versione con confini comunali/cantonali e mappe nazionali
+
+---
+
 ## Avviso di copyright
 
 Questo progetto si basa sul fantastico lavoro di Francesco Bedini, che ha creato un modello per sviluppare gli userscript di WME in Typescript. Potete trovare il progetto originale [qui](https://github.com/bedo2991/wme-typescript).
