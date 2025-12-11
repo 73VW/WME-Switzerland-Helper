@@ -208,9 +208,13 @@ function initScript() {
     activateLanguage();
     createLayers();
     registerLayerCheckboxes();
-    restoreLayerState();
     registerLayerEvents();
     await addScriptTab();
+
+    // Restore layer state only after WME is fully ready (data loaded, user logged in)
+    wmeSDK.Events.once({ eventName: "wme-ready" }).then(() => {
+      restoreLayerState();
+    });
   }
 
   init();
