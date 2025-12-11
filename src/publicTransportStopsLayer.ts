@@ -20,13 +20,8 @@
 import { WmeSDK, VenueCategoryId } from "wme-sdk-typings";
 import { SBBDataLayer, SBBRecord } from "./sbbDataLayer";
 import { showWmeDialog } from "./utils";
-import { centroid, distance, point, Units } from "@turf/turf";
-import type {
-  Geometry,
-  MultiPolygon,
-  Point as GeoPoint,
-  Polygon,
-} from "geojson";
+import { distance, point } from "@turf/turf";
+import type { MultiPolygon, Point as GeoPoint, Polygon } from "geojson";
 
 interface TransportStop extends SBBRecord {
   meansoftransport: string;
@@ -113,23 +108,101 @@ class PublicTransportStopsLayer extends SBBDataLayer {
     return { lat, lon };
   }
 
-  private venuePointFromGeometry(
-    geometry: VenueGeometry,
-  ): ReturnType<typeof point> | null {
+  private pointToLineSegmentDistance(args: {
+    point: ReturnType<typeof point>;
+    lineStart: [number, number];
+    lineEnd: [number, number];
+  }): number {
+    const { point: p, lineStart, lineEnd } = args;
+    const [px, py] = p.geometry.coordinates;
+    const [x1, y1] = lineStart;
+    const [x2, y2] = lineEnd;
+
+    // Calculer la distance au carré du segment
+    const A = px - x1;
+    const B = py - y1;
+    const C = x2 - x1;
+    const D = y2 - y1;
+
+    const dot = A * C + B * D;
+    const lenSq = C * C + D * D;
+    let param = -1;
+
+    if (lenSq !== 0) {
+      param = dot / lenSq;
+    }
+
+    let xx: number;
+    let yy: number;
+
+    if (param < 0) {
+      xx = x1;
+      yy = y1;
+    } else if (param > 1) {
+      xx = x2;
+      yy = y2;
+    } else {
+      xx = x1 + param * C;
+      yy = y1 + param * D;
+    }
+
+    const closestPoint = point([xx, yy]);
+    const distanceMeters = distance(p, closestPoint, { units: "meters" });
+    return distanceMeters;
+  }
+
+  private distanceToVenueGeometry(args: {
+    stopPoint: ReturnType<typeof point>;
+    geometry: VenueGeometry;
+  }): number | null {
+    const { stopPoint, geometry } = args;
+
     if (geometry.type === "Point") {
       const coords = geometry.coordinates as number[];
       if (!Array.isArray(coords) || coords.length < 2) return null;
       const [vLon, vLat] = coords;
       if (typeof vLon !== "number" || typeof vLat !== "number") return null;
-      return point([vLon, vLat]);
+      const venuePoint = point([vLon, vLat]);
+      return distance(stopPoint, venuePoint, { units: "meters" });
     }
 
-    if (geometry.type === "Polygon" || geometry.type === "MultiPolygon") {
-      return centroid({
-        type: "Feature",
-        geometry: geometry as Geometry,
-        properties: {},
-      });
+    if (geometry.type === "Polygon") {
+      const polygon = geometry as Polygon;
+      // Pour un polygone, calculer la distance minimale au périmètre
+      let minDistance = Infinity;
+
+      for (const ring of polygon.coordinates) {
+        for (let i = 0; i < ring.length - 1; i++) {
+          const dist = this.pointToLineSegmentDistance({
+            point: stopPoint,
+            lineStart: ring[i] as [number, number],
+            lineEnd: ring[i + 1] as [number, number],
+          });
+          minDistance = Math.min(minDistance, dist);
+        }
+      }
+
+      return minDistance;
+    }
+
+    if (geometry.type === "MultiPolygon") {
+      const multiPolygon = geometry as MultiPolygon;
+      let minDistance = Infinity;
+
+      for (const polygon of multiPolygon.coordinates) {
+        for (const ring of polygon) {
+          for (let i = 0; i < ring.length - 1; i++) {
+            const dist = this.pointToLineSegmentDistance({
+              point: stopPoint,
+              lineStart: ring[i] as [number, number],
+              lineEnd: ring[i + 1] as [number, number],
+            });
+            minDistance = Math.min(minDistance, dist);
+          }
+        }
+      }
+
+      return minDistance;
     }
 
     return null;
@@ -141,10 +214,13 @@ class PublicTransportStopsLayer extends SBBDataLayer {
     radiusMeters: number;
   }): boolean {
     const { venue, stopPoint, radiusMeters } = args;
-    const venuePoint = this.venuePointFromGeometry(venue.geometry);
-    if (!venuePoint) return false;
-    const options = { units: "meters" as Units };
-    const distMeters = distance(stopPoint, venuePoint, options);
+    console.info("Checking venue", venue.id, venue.name);
+    console.info("Checking venue", venue.id, venue.name);
+    const distMeters = this.distanceToVenueGeometry({
+      stopPoint,
+      geometry: venue.geometry,
+    });
+    if (distMeters === null) return false;
     return distMeters <= radiusMeters;
   }
 
@@ -164,7 +240,9 @@ class PublicTransportStopsLayer extends SBBDataLayer {
       meansoftransport: stop.meansoftransport,
     });
     const venues = wmeSDK.DataModel.Venues.getAll() as VenueLike[];
-
+    console.info(
+      `Checking stop "${name}" with categories ${venueCategories.join(", ")}`,
+    );
     const stopLonLat = this.stopLonLat(stop);
     // If coordinates are missing, keep drawing to let the user handle it.
     if (!stopLonLat) {
