@@ -214,8 +214,6 @@ class PublicTransportStopsLayer extends SBBDataLayer {
     radiusMeters: number;
   }): boolean {
     const { venue, stopPoint, radiusMeters } = args;
-    console.info("Checking venue", venue.id, venue.name);
-    console.info("Checking venue", venue.id, venue.name);
     const distMeters = this.distanceToVenueGeometry({
       stopPoint,
       geometry: venue.geometry,
@@ -240,9 +238,6 @@ class PublicTransportStopsLayer extends SBBDataLayer {
       meansoftransport: stop.meansoftransport,
     });
     const venues = wmeSDK.DataModel.Venues.getAll() as VenueLike[];
-    console.info(
-      `Checking stop "${name}" with categories ${venueCategories.join(", ")}`,
-    );
     const stopLonLat = this.stopLonLat(stop);
     // If coordinates are missing, keep drawing to let the user handle it.
     if (!stopLonLat) {
