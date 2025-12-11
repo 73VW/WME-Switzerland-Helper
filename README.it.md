@@ -97,17 +97,40 @@ Grazie per aver contribuito a rendere Waze migliore per tutti in Svizzera!
 
 ## 📝 Changelog
 
-### v1.2.1
+Tutti i cambiamenti notevoli di questo progetto sono documentati qui.
+
+Il formato è basato su [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+e questo progetto aderisce al [Versionamento Semantico](https://semver.org/spec/v2.0.0.html).
+
+### [1.2.2] - 2025-12-11
+
+#### Risolto
+
+- Risolto il caricamento di tutte le fermate di trasporto pubblico al ricaricamento dello script quando la casella era preselezionata. Lo stato del layer viene ora ripristinato dopo l'evento `wme-ready` per garantire che i dati delle location siano disponibili prima di filtrare le fermate duplicate.
+
+### [1.2.1] - 2025-12-10
+
+#### Modificato
+
 - 💾 Stato delle caselle dei livelli conservato tra i reload
 - ⚡ Rendering più veloce; si aggiornano solo elementi nuovi/rimossi
 
-### v1.2.0
+### [1.2.0]
+
+#### Aggiunto
+
 - 🚏 Layer Fermate trasporto pubblico con gestione del click
 
-### v1.1.0
+### [1.1.0]
+
+#### Aggiunto
+
 - 🗺️ Aggiunto overlay swissNAMES3D
 
-### v1.0.0
+### [1.0.0]
+
+#### Aggiunto
+
 - 🎉 Prima versione con confini comunali/cantonali e mappe nazionali
 
 ---

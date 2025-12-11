@@ -97,17 +97,40 @@ Vielen Dank, dass Sie helfen, Waze für alle in der Schweiz besser zu machen!
 
 ## 📝 Changelog
 
-### v1.2.1
+Alle bemerkenswerten Änderungen an diesem Projekt sind hier dokumentiert.
+
+Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+### [1.2.2] - 2025-12-11
+
+#### Behoben
+
+- Fehler beim Laden aller Haltestellen beim Script-Neustart behoben, wenn die Checkbox vorher angehakt war. Der Layer-Status wird nun nach dem `wme-ready`-Event wiederhergestellt, um sicherzustellen, dass Venue-Daten verfügbar sind, bevor doppelte Haltestellen gefiltert werden.
+
+### [1.2.1] - 2025-12-10
+
+#### Geändert
+
 - 💾 Layer-Kontrollkästchen bleiben über Reloads erhalten
 - ⚡ Schnelleres Rendering; nur neue/entfernte Elemente werden aktualisiert
 
-### v1.2.0
+### [1.2.0]
+
+#### Hinzugefügt
+
 - 🚏 Layer für ÖV-Haltestellen mit Klick-Handling
 
-### v1.1.0
+### [1.1.0]
+
+#### Hinzugefügt
+
 - 🗺️ swissNAMES3D-Overlay hinzugefügt
 
-### v1.0.0
+### [1.0.0]
+
+#### Hinzugefügt
+
 - 🎉 Erste Version mit Gemeinde-/Kantonsgrenzen und nationalen Kartenkacheln
 
 ---

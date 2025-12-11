@@ -97,17 +97,40 @@ Merci de nous aider à améliorer Waze pour tout le monde en Suisse !
 
 ## 📝 Changelog
 
-### v1.2.1
+Tous les changements notables de ce projet sont documentés ici.
+
+Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+et ce projet adhère au [Versionnage Sémantique](https://semver.org/spec/v2.0.0.html).
+
+### [1.2.2] - 2025-12-11
+
+#### Corrigé
+
+- Correction du chargement de tous les arrêts de transport public lors du rechargement du script quand la case était précochée. L'état de la couche est maintenant restauré après l'événement `wme-ready` pour s'assurer que les données des lieux sont disponibles avant de filtrer les arrêts en double.
+
+### [1.2.1] - 2025-12-10
+
+#### Modifié
+
 - 💾 L'état des cases des couches est conservé entre les rechargements
 - ⚡ Rendu plus rapide : seules les nouveautés/suppressions sont appliquées
 
-### v1.2.0
+### [1.2.0]
+
+#### Ajouté
+
 - 🚏 Couche Arrêts de transport public avec gestion du clic
 
-### v1.1.0
+### [1.1.0]
+
+#### Ajouté
+
 - 🗺️ Ajout de l'overlay swissNAMES3D
 
-### v1.0.0
+### [1.0.0]
+
+#### Ajouté
+
 - 🎉 Première version avec limites communales/cantonales et fonds nationaux
 
 ---

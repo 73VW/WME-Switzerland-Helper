@@ -97,17 +97,40 @@ Thank you for helping make Waze better for everyone in Switzerland!
 
 ## 📝 Changelog
 
-### v1.2.1
+All notable changes to this project are documented here.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+### [1.2.2] - 2025-12-11
+
+#### Fixed
+
+- Fixed public transport stops loading all stops on script reload when checkbox was pre-checked. Layer state is now restored after `wme-ready` event to ensure venues data is available before filtering duplicate stops.
+
+### [1.2.1] - 2025-12-10
+
+#### Changed
+
 - 💾 Layer checkbox states persist across reloads
 - ⚡ Faster feature-layer rendering; only new/removed features update
 
-### v1.2.0
+### [1.2.0]
+
+#### Added
+
 - 🚏 Public Transport Stops layer with click handling
 
-### v1.1.0
+### [1.1.0]
+
+#### Added
+
 - 🗺️ Added swissNAMES3D overlay
 
-### v1.0.0
+### [1.0.0]
+
+#### Added
+
 - 🎉 Initial release with municipal and cantonal boundaries + national map tiles
 
 ---
