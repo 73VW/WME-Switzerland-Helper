@@ -16,6 +16,7 @@ import { FeatureLayer } from "./src/featureLayer";
 import { PublicTransportStopsLayer } from "./src/publicTransportStopsLayer";
 import i18next from "./locales/i18n";
 import { SidebarSection } from "./src/sidebar";
+import { saveLayerState, isLayerEnabled } from "./src/storage";
 
 const englishScriptName = "WME Switzerland helper";
 let scriptName = englishScriptName;
@@ -138,12 +139,29 @@ function initScript() {
     }
   }
 
+  function restoreLayerState() {
+    for (const layer of layers.values()) {
+      const enabled = isLayerEnabled(layer.name);
+      if (enabled === true) {
+        layer.addToMap({ wmeSDK });
+        wmeSDK.LayerSwitcher.setLayerCheckboxChecked({
+          name: layer.name,
+          isChecked: true,
+        });
+        if (layer instanceof FeatureLayer) {
+          layer.render({ wmeSDK });
+        }
+      }
+    }
+  }
+
   function registerLayerEvents() {
     wmeSDK.Events.on({
       eventName: "wme-layer-checkbox-toggled",
       eventHandler: ({ name, checked }) => {
         const layer = layers.get(name);
         if (!layer) return;
+        saveLayerState(name, checked);
         if (checked) {
           layer.addToMap({ wmeSDK });
         } else {
@@ -190,6 +208,7 @@ function initScript() {
     activateLanguage();
     createLayers();
     registerLayerCheckboxes();
+    restoreLayerState();
     registerLayerEvents();
     await addScriptTab();
   }
