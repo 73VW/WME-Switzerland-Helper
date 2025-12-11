@@ -33,12 +33,14 @@ abstract class FeatureLayer extends Layer {
   styleRules?: Array<{ style: Record<string, unknown> }>;
   features: Map<string | number, unknown>;
   minZoomLevel: number;
+  visibleFeatureIds: Set<string | number>;
 
   constructor(args: FeatureLayerConstructorArgs) {
     super({ name: args.name });
     this.styleContext = args.styleContext;
     this.styleRules = args.styleRules;
     this.features = new Map();
+    this.visibleFeatureIds = new Set();
     this.minZoomLevel = 15;
   }
 
@@ -53,6 +55,12 @@ abstract class FeatureLayer extends Layer {
     wmeSDK.Events.trackLayerEvents({ layerName: this.name });
 
     await this.render({ wmeSDK });
+  }
+
+  removeFromMap(args: { wmeSDK: WmeSDK }): void {
+    super.removeFromMap(args);
+    // Clear the tracking set when layer is removed
+    this.visibleFeatureIds.clear();
   }
 
   abstract featureClicked(args: {
@@ -96,10 +104,12 @@ abstract class FeatureLayer extends Layer {
     }
 
     const zoomLevel = wmeSDK.Map.getZoomLevel();
-    wmeSDK.Map.removeAllFeaturesFromLayer({ layerName: this.name });
     if (zoomLevel < this.minZoomLevel) {
       return;
     }
+
+    // Track new features in this render pass
+    const newFeatureIds = new Set<string | number>();
 
     for await (const batch of this.fetchData({ wmeSDK })) {
       console.log(`Fetched batch of ${batch.length} records`);
@@ -109,13 +119,40 @@ abstract class FeatureLayer extends Layer {
           if (!(await this.shouldDrawRecord({ wmeSDK, record }))) {
             continue;
           }
-          this.drawFeatures({ wmeSDK, features: [record] });
+
+          // Get the feature ID from the record (assumes it has an 'id' property)
+          const recordId = (record as { id?: string | number }).id;
+          if (recordId !== undefined) {
+            newFeatureIds.add(recordId);
+
+            // Only draw if not already visible
+            if (!this.visibleFeatureIds.has(recordId)) {
+              this.drawFeatures({ wmeSDK, features: [record] });
+              this.visibleFeatureIds.add(recordId);
+            }
+          } else {
+            // Fallback: draw if ID is not available
+            this.drawFeatures({ wmeSDK, features: [record] });
+          }
         } catch (error) {
           console.error(error);
           console.log(record);
           return;
         }
       }
+    }
+
+    // Remove features that are no longer in the response
+    const featuresToRemove = Array.from(this.visibleFeatureIds).filter(
+      (id) => !newFeatureIds.has(id),
+    );
+
+    for (const featureId of featuresToRemove) {
+      wmeSDK.Map.removeFeatureFromLayer({
+        featureId,
+        layerName: this.name,
+      });
+      this.visibleFeatureIds.delete(featureId);
     }
   }
 }
