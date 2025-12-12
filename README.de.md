@@ -102,6 +102,20 @@ Alle bemerkenswerten Änderungen an diesem Projekt sind hier dokumentiert.
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### [1.2.3] - 2025-12-12
+
+#### Geändert
+
+- Architektur-Refactoring: Dreifache Vererbung entfernt, `SBBDataLayer` ist jetzt eine Utility-Klasse (Komposition statt Vererbung)
+- Performance-Optimierung: Delta-basierter Ansatz (nur neue Features zeichnen, veraltete in Batch entfernen)
+- Verbesserte Filter-Effizienz: Venues einmalig pro Rendu-Durchlauf statt pro SDK-Datensatz abrufen
+- `waitForMapIdle()` Utility für korrektes Warten auf Kartendaten nach Zoom-Operationen
+- Zoom-auf-17-Flow korrigiert: wartet jetzt auf Venues-Verfügbarkeit vor Re-Filter
+
+#### Behoben
+
+- ÖV-Haltestellen zeigen nach Zoom von < 17 zu 17 keine Duplikate mehr
+
 ### [1.2.2] - 2025-12-11
 
 #### Behoben

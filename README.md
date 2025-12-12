@@ -102,6 +102,20 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### [1.2.3] - 2025-12-12
+
+#### Changed
+
+- Refactored feature layer architecture: removed triple inheritance, `SBBDataLayer` is now a utility class (composition over inheritance)
+- Optimized rendering performance: delta-based approach (only draw new/changed features, batch remove obsolete ones)
+- Improved filtering efficiency: venues fetched once per render pass instead of per-record SDK calls
+- Added `waitForMapIdle()` utility to properly wait for map data after zoom operations
+- Fixed zoom-to-17 flow: now waits for venues to be available before re-filtering features
+
+#### Fixed
+
+- Public transport stops no longer show duplicate matches after zooming in from < 17 to 17
+
 ### [1.2.2] - 2025-12-11
 
 #### Fixed

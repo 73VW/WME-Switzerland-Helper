@@ -102,6 +102,20 @@ Tous les changements notables de ce projet sont documentés ici.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et ce projet adhère au [Versionnage Sémantique](https://semver.org/spec/v2.0.0.html).
 
+### [1.2.3] - 2025-12-12
+
+#### Modifié
+
+- Refactorisé l'architecture de la couche de features : supprimé l'héritage triple, `SBBDataLayer` est maintenant une classe utilitaire (composition plutôt qu'héritage)
+- Optimisé les perfs : approche basée sur le delta (dessiner seulement les nouvelles features, supprimer les obsolètes en batch)
+- Amélioré l'efficacité du filtrage : les lieux sont récupérés une seule fois par passage de rendu au lieu d'appels SDK par enregistrement
+- Ajout utilitaire `waitForMapIdle()` pour attendre proprement les données de la carte après les zooms
+- Corrigé le flux zoom-vers-17 : attend maintenant que les lieux soient disponibles avant de re-filtrer les features
+
+#### Corrigé
+
+- Les arrêts de transport public n'affichent plus les doublons après avoir zoomé de < 17 à 17
+
 ### [1.2.2] - 2025-12-11
 
 #### Corrigé
