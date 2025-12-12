@@ -28,13 +28,14 @@ class TileLayer extends Layer {
   zIndex: number;
   constructor(args: {
     name: string;
+    wmeSDK: WmeSDK;
     tileHeight: number;
     tileWidth: number;
     fileName: string;
     servers: string[];
     zIndex?: number; // make zIndex optional
   }) {
-    super({ name: args.name }); // call the super class constructor and pass in the name parameter
+    super({ name: args.name, wmeSDK: args.wmeSDK });
     this.tileHeight = args.tileHeight;
     this.tileWidth = args.tileWidth;
     this.fileName = args.fileName;
@@ -62,6 +63,10 @@ class TileLayer extends Layer {
       layerName: this.name,
       zIndex: this.zIndex,
     });
+  }
+
+  registerEvents(args: { wmeSDK: WmeSDK }): void {
+    // Pas d'événements dynamiques pour les couches de tuiles.
   }
 }
 

@@ -18,7 +18,6 @@
  */
 
 import { WmeSDK } from "wme-sdk-typings";
-import { FeatureLayer } from "./featureLayer";
 
 interface SBBRecord {
   number: string;
@@ -29,49 +28,18 @@ interface SBBRecord {
   [key: string]: unknown;
 }
 
-interface SBBDataLayerConstructorArgs {
-  name: string;
-  styleContext?: Record<string, unknown>;
-  styleRules?: Array<{
-    style: Record<string, unknown>;
-  }>;
-}
+class SBBDataFetcher {
+  private readonly baseUrl: string;
+  private readonly dataSet: string;
+  private readonly maxRecordsPerPage: number;
 
-abstract class SBBDataLayer extends FeatureLayer {
-  baseUrl: string;
-  minZoomLevel: number;
-  dataSet: string;
-  maxRecordsPerPage: number;
-
-  constructor(args: SBBDataLayerConstructorArgs) {
-    super(args);
+  constructor(args: { dataSet: string }) {
     this.baseUrl = "https://data.sbb.ch/api/explore/v2.1/catalog/datasets";
-    this.minZoomLevel = 14;
-    this.dataSet = "";
+    this.dataSet = args.dataSet;
     this.maxRecordsPerPage = 50;
   }
 
-  addRecordToFeatures(args: { record: SBBRecord }): void {
-    const { record } = args;
-    this.features.set(record.number, record);
-  }
-
-  mapRecordToFeature(args: { record: SBBRecord }): unknown {
-    const { record } = args;
-    return {
-      geometry: {
-        coordinates: [
-          record.geopos_haltestelle.lon,
-          record.geopos_haltestelle.lat,
-        ],
-        type: "Point",
-      },
-      type: "Feature",
-      id: record.number,
-    };
-  }
-
-  async *fetchData(args: {
+  async *fetchRecords(args: {
     wmeSDK: WmeSDK;
     offset?: number;
   }): AsyncGenerator<SBBRecord[], void, unknown> {
@@ -82,7 +50,6 @@ abstract class SBBDataLayer extends FeatureLayer {
     const x2 = mapExtent[2];
     const y2 = mapExtent[3];
     const url = `${this.baseUrl}/${this.dataSet}/records?where=in_bbox(geopos_haltestelle,${y1},${x1},${y2},${x2})&limit=50&offset=${offset}`;
-    console.log(url);
 
     const response = await GM.xmlHttpRequest({
       method: "GET",
@@ -91,17 +58,16 @@ abstract class SBBDataLayer extends FeatureLayer {
     });
 
     const batch = (response.response?.results as SBBRecord[]) || [];
-
-    yield batch; // Yield the current batch
+    yield batch;
 
     if (batch.length === this.maxRecordsPerPage) {
-      yield* this.fetchData({
+      yield* this.fetchRecords({
         wmeSDK,
         offset: offset + this.maxRecordsPerPage,
-      }); // Yield next batches
+      });
     }
   }
 }
 
-export { SBBDataLayer };
+export { SBBDataFetcher };
 export type { SBBRecord };

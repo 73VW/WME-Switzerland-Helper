@@ -50,6 +50,7 @@ function initScript() {
   function createLayers() {
     const layerList = [
       new TileLayer({
+        wmeSDK: wmeSDK,
         name: i18next.t(
           "common:layers.boundaries.municipality",
           "Municipal boundaries",
@@ -63,6 +64,7 @@ function initScript() {
         zIndex: 2039,
       }),
       new TileLayer({
+        wmeSDK: wmeSDK,
         name: i18next.t(
           "common:layers.boundaries.state",
           "Cantonal boundaries",
@@ -76,6 +78,7 @@ function initScript() {
         zIndex: 2038,
       }),
       new TileLayer({
+        wmeSDK: wmeSDK,
         name: i18next.t("common:layers.3d", "Geographical Names swissNAMES3D"),
         tileHeight: 256,
         tileWidth: 256,
@@ -86,6 +89,7 @@ function initScript() {
         zIndex: 2037,
       }),
       new TileLayer({
+        wmeSDK: wmeSDK,
         name: i18next.t(
           "common:layers.topo.national_colors",
           "National Maps (color)",
@@ -99,6 +103,7 @@ function initScript() {
         zIndex: 2036,
       }),
       new TileLayer({
+        wmeSDK: wmeSDK,
         name: i18next.t(
           "common:layers.background.swissimage",
           "SWISSIMAGE Background",
@@ -111,6 +116,7 @@ function initScript() {
         ],
       }),
       new PublicTransportStopsLayer({
+        wmeSDK: wmeSDK,
         name: i18next.t(
           "common:layers.public_transport_stops",
           "Public Transport Stops",
@@ -133,64 +139,9 @@ function initScript() {
     }
   }
 
-  function registerLayerCheckboxes() {
-    for (const layer of layers.values()) {
-      layer.addCheckBox({ wmeSDK });
-    }
-  }
+  // State restoration delegated to each layer
 
-  function restoreLayerState() {
-    for (const layer of layers.values()) {
-      const enabled = isLayerEnabled(layer.name);
-      if (enabled === true) {
-        layer.addToMap({ wmeSDK });
-        wmeSDK.LayerSwitcher.setLayerCheckboxChecked({
-          name: layer.name,
-          isChecked: true,
-        });
-        if (layer instanceof FeatureLayer) {
-          layer.render({ wmeSDK });
-        }
-      }
-    }
-  }
-
-  function registerLayerEvents() {
-    wmeSDK.Events.on({
-      eventName: "wme-layer-checkbox-toggled",
-      eventHandler: ({ name, checked }) => {
-        const layer = layers.get(name);
-        if (!layer) return;
-        saveLayerState(name, checked);
-        if (checked) {
-          layer.addToMap({ wmeSDK });
-        } else {
-          layer.removeFromMap({ wmeSDK });
-        }
-      },
-    });
-
-    wmeSDK.Events.on({
-      eventName: "wme-layer-feature-clicked",
-      eventHandler: async ({ featureId, layerName }) => {
-        const layer = layers.get(layerName);
-        if (layer && layer instanceof FeatureLayer) {
-          await layer.featureClicked({ wmeSDK, featureId });
-        }
-      },
-    });
-
-    wmeSDK.Events.on({
-      eventName: "wme-map-move-end",
-      eventHandler: () => {
-        for (const layer of layers.values()) {
-          if (layer instanceof FeatureLayer) {
-            layer.render({ wmeSDK });
-          }
-        }
-      },
-    });
-  }
+  // Per-layer events are registered inside each layer class
 
   async function addScriptTab() {
     const { tabLabel, tabPane } = await wmeSDK.Sidebar.registerScriptTab();
@@ -207,13 +158,14 @@ function initScript() {
   async function init() {
     activateLanguage();
     createLayers();
-    registerLayerCheckboxes();
-    registerLayerEvents();
+    // Les cases sont ajoutées lors de createLayers
     await addScriptTab();
 
     // Restore layer state only after WME is fully ready (data loaded, user logged in)
     wmeSDK.Events.once({ eventName: "wme-ready" }).then(() => {
-      restoreLayerState();
+      for (const layer of layers.values()) {
+        layer.restoreState({ wmeSDK });
+      }
     });
   }
 

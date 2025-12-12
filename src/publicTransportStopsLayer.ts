@@ -17,11 +17,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { WmeSDK, VenueCategoryId } from "wme-sdk-typings";
-import { SBBDataLayer, SBBRecord } from "./sbbDataLayer";
-import { showWmeDialog } from "./utils";
-import { distance, point } from "@turf/turf";
-import type { MultiPolygon, Point as GeoPoint, Polygon } from "geojson";
+import { WmeSDK, VenueCategoryId, SdkFeature, SdkFeatureStyleRule } from "wme-sdk-typings";
+import { SBBDataFetcher, SBBRecord } from "./sbbDataLayer";
+import { FeatureLayer } from "./featureLayer";
+import { showWmeDialog, waitForMapIdle } from "./utils";
+import { StopGeometry } from "./stopGeometry";
+import { StopNameFormatter } from "./stopNameFormatter";
+import { VenueMatcher, type VenueLike } from "./venueMatcher";
 
 interface TransportStop extends SBBRecord {
   meansoftransport: string;
@@ -34,59 +36,63 @@ interface TransportStop extends SBBRecord {
   lon?: number;
 }
 
-interface RecordNameResult {
-  name: string;
-  aliases: string[];
-  shortName: string;
-}
-
 interface PublicTransportStopsLayerConstructorArgs {
   name: string;
-  styleRules?: Array<{
-    style: Record<string, unknown>;
-  }>;
+  styleRules?: SdkFeatureStyleRule[];
 }
 
-type VenueGeometry =
-  | GeoPoint
-  | Polygon
-  | MultiPolygon
-  | {
-      type: string;
-      coordinates: unknown;
+class PublicTransportStopsLayer extends FeatureLayer {
+  private readonly dataFetcher: SBBDataFetcher;
+  private readonly stopGeometry: StopGeometry;
+  private readonly nameFormatter: StopNameFormatter;
+  private readonly venueMatcher: VenueMatcher;
+
+  constructor(
+    args: PublicTransportStopsLayerConstructorArgs & { wmeSDK: WmeSDK },
+  ) {
+    super({ ...args, wmeSDK: args.wmeSDK, minZoomLevel: 14 });
+    this.dataFetcher = new SBBDataFetcher({ dataSet: "haltestelle-haltekante" });
+    this.stopGeometry = new StopGeometry();
+    this.nameFormatter = new StopNameFormatter();
+    this.venueMatcher = new VenueMatcher();
+  }
+
+  getRecordId(args: { record: unknown }): string {
+    const record = args.record as TransportStop;
+    return String(record.number);
+  }
+
+  mapRecordToFeature(args: { record: unknown }): SdkFeature {
+    const record = args.record as TransportStop;
+    return {
+      geometry: {
+        coordinates: [
+          record.geopos_haltestelle.lon,
+          record.geopos_haltestelle.lat,
+        ],
+        type: "Point",
+      },
+      type: "Feature",
+      id: String(record.number),
     };
+  }
 
-interface VenueLike {
-  id: string | number;
-  name: string;
-  categories: string[];
-  geometry: VenueGeometry;
-  _updateCoordinates?: boolean;
-}
-
-class PublicTransportStopsLayer extends SBBDataLayer {
-  venueInnerTypeMapping: Map<string, string>;
-  defaultVenueInnerType: string;
-
-  constructor(args: PublicTransportStopsLayerConstructorArgs) {
-    super(args);
-    this.dataSet = "haltestelle-haltekante";
-    this.venueInnerTypeMapping = new Map();
-    this.defaultVenueInnerType = "arrêt";
-    this.venueInnerTypeMapping.set("TRAIN", "gare");
-    this.venueInnerTypeMapping.set("BOAT", "port");
-    this.venueInnerTypeMapping.set("CHAIRLIFT", "remontée mécanique");
+  async *fetchData(args: {
+    wmeSDK: WmeSDK;
+  }): AsyncGenerator<TransportStop[], void, unknown> {
+    const { wmeSDK } = args;
+    for await (const batch of this.dataFetcher.fetchRecords({ wmeSDK })) {
+      yield batch as TransportStop[];
+    }
   }
 
   meansOfTransport(args: { meansoftransport: string }): string[] {
-    return Array.from(args.meansoftransport.split("|"));
+    return args.meansoftransport.split("|");
   }
 
   venueCategories(args: { meansoftransport: string }): string[] {
-    const meansOfTransport = this.meansOfTransport({
-      meansoftransport: args.meansoftransport,
-    });
-    return Array.from(meansOfTransport).map((mean) => {
+    const meansOfTransport = this.meansOfTransport(args);
+    return meansOfTransport.map((mean) => {
       if (mean === "METRO") return "SUBWAY_STATION";
       if (mean === "BOAT") return "SEAPORT_MARINA_HARBOR";
       if (mean === "CHAIRLIFT") return "TRANSPORTATION";
@@ -108,356 +114,144 @@ class PublicTransportStopsLayer extends SBBDataLayer {
     return { lat, lon };
   }
 
-  private pointToLineSegmentDistance(args: {
-    point: ReturnType<typeof point>;
-    lineStart: [number, number];
-    lineEnd: [number, number];
-  }): number {
-    const { point: p, lineStart, lineEnd } = args;
-    const [px, py] = p.geometry.coordinates;
-    const [x1, y1] = lineStart;
-    const [x2, y2] = lineEnd;
-
-    // Calculer la distance au carré du segment
-    const A = px - x1;
-    const B = py - y1;
-    const C = x2 - x1;
-    const D = y2 - y1;
-
-    const dot = A * C + B * D;
-    const lenSq = C * C + D * D;
-    let param = -1;
-
-    if (lenSq !== 0) {
-      param = dot / lenSq;
-    }
-
-    let xx: number;
-    let yy: number;
-
-    if (param < 0) {
-      xx = x1;
-      yy = y1;
-    } else if (param > 1) {
-      xx = x2;
-      yy = y2;
-    } else {
-      xx = x1 + param * C;
-      yy = y1 + param * D;
-    }
-
-    const closestPoint = point([xx, yy]);
-    const distanceMeters = distance(p, closestPoint, { units: "meters" });
-    return distanceMeters;
+  getFilterContext(args: { wmeSDK: WmeSDK }): { venues: VenueLike[] } {
+    const { wmeSDK } = args;
+    const venues = wmeSDK.DataModel.Venues.getAll() as VenueLike[];
+    return { venues };
   }
 
-  private distanceToVenueGeometry(args: {
-    stopPoint: ReturnType<typeof point>;
-    geometry: VenueGeometry;
-  }): number | null {
-    const { stopPoint, geometry } = args;
-
-    if (geometry.type === "Point") {
-      const coords = geometry.coordinates as number[];
-      if (!Array.isArray(coords) || coords.length < 2) return null;
-      const [vLon, vLat] = coords;
-      if (typeof vLon !== "number" || typeof vLat !== "number") return null;
-      const venuePoint = point([vLon, vLat]);
-      return distance(stopPoint, venuePoint, { units: "meters" });
-    }
-
-    if (geometry.type === "Polygon") {
-      const polygon = geometry as Polygon;
-      // Pour un polygone, calculer la distance minimale au périmètre
-      let minDistance = Infinity;
-
-      for (const ring of polygon.coordinates) {
-        for (let i = 0; i < ring.length - 1; i++) {
-          const dist = this.pointToLineSegmentDistance({
-            point: stopPoint,
-            lineStart: ring[i] as [number, number],
-            lineEnd: ring[i + 1] as [number, number],
-          });
-          minDistance = Math.min(minDistance, dist);
-        }
-      }
-
-      return minDistance;
-    }
-
-    if (geometry.type === "MultiPolygon") {
-      const multiPolygon = geometry as MultiPolygon;
-      let minDistance = Infinity;
-
-      for (const polygon of multiPolygon.coordinates) {
-        for (const ring of polygon) {
-          for (let i = 0; i < ring.length - 1; i++) {
-            const dist = this.pointToLineSegmentDistance({
-              point: stopPoint,
-              lineStart: ring[i] as [number, number],
-              lineEnd: ring[i + 1] as [number, number],
-            });
-            minDistance = Math.min(minDistance, dist);
-          }
-        }
-      }
-
-      return minDistance;
-    }
-
-    return null;
-  }
-
-  private isVenueWithinRadius(args: {
-    venue: VenueLike;
-    stopPoint: ReturnType<typeof point>;
-    radiusMeters: number;
-  }): boolean {
-    const { venue, stopPoint, radiusMeters } = args;
-    const distMeters = this.distanceToVenueGeometry({
-      stopPoint,
-      geometry: venue.geometry,
-    });
-    if (distMeters === null) return false;
-    return distMeters <= radiusMeters;
-  }
-
-  async shouldDrawRecord(args: {
+  shouldDrawRecord(args: {
     wmeSDK: WmeSDK;
     record: unknown;
-  }): Promise<boolean> {
-    const { wmeSDK, record } = args;
+    context?: { venues: VenueLike[] };
+  }): boolean {
+    const { record, context } = args;
     const stop = record as TransportStop;
 
     if (!stop.meansoftransport || stop.meansoftransport === "") {
       return false;
     }
 
-    const { name } = this.recordName({ record: stop });
-    const venueCategories = this.venueCategories({
-      meansoftransport: stop.meansoftransport,
-    });
-    const venues = wmeSDK.DataModel.Venues.getAll() as VenueLike[];
     const stopLonLat = this.stopLonLat(stop);
-    // If coordinates are missing, keep drawing to let the user handle it.
     if (!stopLonLat) {
       return true;
     }
 
-    const stopPoint = point([stopLonLat.lon, stopLonLat.lat]);
-
-    // Only skip drawing if an existing venue has the same name, matching category, and is within 5m.
-    const hasSameNameTypeAndNearby = venues.some((v) => {
-      if (v.name !== name) return false;
-      const hasMatchingCategory = v.categories.some((cat) =>
-        venueCategories.includes(cat),
-      );
-      if (!hasMatchingCategory) return false;
-
-      const hasNearby = this.isVenueWithinRadius({
-        venue: v,
-        stopPoint,
-        radiusMeters: 5,
-      });
-
-      if (!hasNearby) return false;
-      return true;
+    const { name } = this.nameFormatter.formatName(stop);
+    const venueCategories = this.venueCategories({
+      meansoftransport: stop.meansoftransport,
     });
+    const venues = context?.venues ?? [];
 
-    return !hasSameNameTypeAndNearby;
+    return !this.venueMatcher.hasExactMatch({
+      venues,
+      stopLon: stopLonLat.lon,
+      stopLat: stopLonLat.lat,
+      stopName: name,
+      categories: venueCategories,
+    });
   }
 
-  recordName(args: { record: TransportStop }): RecordNameResult {
-    const { record } = args;
+  private handleZoomRequired(args: {
+    wmeSDK: WmeSDK;
+    lat: number;
+    lon: number;
+  }): void {
+    const { wmeSDK, lat, lon } = args;
+    this.unregisterEvents();
 
-    let organizationAbbreviation = record.businessorganisationabbreviationde;
-    let organizationName = record.businessorganisationdescriptionde;
-    const aliases: string[] = [];
-    let name = record.designationofficial || record.designation || "Bus Stop";
+    wmeSDK.Map.setMapCenter({ lonLat: { lat, lon }, zoomLevel: 17 });
 
-    // Remove explicit chairlift marker if present; we will append inner type later
-    name = name.replace(/\(télésiège\)/i, "");
-    const splittedName = name.split(",");
+    this.registerEvents({ wmeSDK });
 
-    if (
-      splittedName.length === 2 &&
-      splittedName[0].trim() === record.municipalityname
-    ) {
-      name = splittedName[1];
-    }
-    // We don't want to remove the municipality name if:
-    // 1) There's only the municipality name as name (like in cff stations name)
-    // 2) The name of the stop is `municipality name`-something
-    else if (
-      name.includes(record.municipalityname) &&
-      name.replace(record.municipalityname, "") !== "" &&
-      !name.replace(record.municipalityname, "").startsWith("-")
-    ) {
-      name = name.replace(record.municipalityname, "");
-    }
-    name = name.trim();
-    name = String(name).charAt(0).toUpperCase() + String(name).slice(1);
-
-    const meansOfTransport = this.meansOfTransport({
-      meansoftransport: record.meansoftransport,
+    waitForMapIdle({ wmeSDK, intervalMs: 50, maxTries: 60 }).then(() => {
+      this.refilterFeatures({ wmeSDK });
     });
-    const venueInnerType = meansOfTransport
-      .map(
-        (mean) =>
-          this.venueInnerTypeMapping.get(mean) || this.defaultVenueInnerType,
-      )
-      .join(", ");
+  }
 
-    if (organizationAbbreviation.toLowerCase() === "sbb") {
-      aliases.push(`${name} (${venueInnerType} ${organizationName})`);
-      aliases.push(`${name} (${venueInnerType} ${organizationAbbreviation})`);
-      organizationAbbreviation = "CFF";
-      organizationName = "Chemins de fer fédéraux CFF";
-    } else if (
-      [
-        "trn/tc",
-        "trn/autovr",
-        "trn/autrvt",
-        "trn-tn",
-        "trn-cmn",
-        "trn-rvt",
-      ].indexOf(organizationAbbreviation.toLowerCase()) !== -1
-    ) {
-      organizationAbbreviation = "transN";
-      organizationName = "Transports Publics Neuchâtelois SA";
-    } else if (organizationAbbreviation.toLowerCase() === "pag") {
-      organizationAbbreviation = "";
-      organizationName = "CarPostal SA";
-    }
+  private async promptUserAction(args: {
+    wmeSDK: WmeSDK;
+    matchingVenues: VenueLike[];
+  }): Promise<{
+    action: "merge" | "merge-with-coords" | "save" | "cancel";
+    venues: VenueLike[];
+  }> {
+    const { wmeSDK, matchingVenues } = args;
 
-    const shortName = name;
+    wmeSDK.Editing.setSelection({
+      selection: {
+        ids: matchingVenues.map((venue) => venue.id.toString()),
+        objectType: "venue",
+      },
+    });
 
-    if (organizationAbbreviation !== "") {
-      aliases.push(`${name} (${venueInnerType} ${organizationName})`);
-      name = `${name} (${venueInnerType} ${organizationAbbreviation})`;
-    } else {
-      name = `${name} (${venueInnerType} ${organizationName})`;
+    const result = await showWmeDialog({
+      message: `Il semble qu'il existe déjà ${matchingVenues.length} arrêt(s) avec ce nom.<br/>Nous les avons sélectionnés pour vous.<br/>Que voulez-vous faire?<br/>Sélectionner <pre style="display: inline;">Fusionner</pre> appliquera les informations aux anciens points sans créer le nouveau.`,
+      buttons: [
+        { label: "Fusionner", value: "merge" },
+        {
+          label: "Fusionner et mettre à jour les coordonnées",
+          value: "merge-with-coords",
+        },
+        { label: "Enregistrer le nouveau", value: "save" },
+        { label: "Annuler", value: "cancel" },
+      ],
+    });
+
+    let venuesToUpdate = matchingVenues;
+
+    if (result === "save") {
+      venuesToUpdate = [];
+    } else if (result === "merge-with-coords") {
+      venuesToUpdate = matchingVenues.map((v) => ({
+        ...v,
+        _updateCoordinates: true,
+      }));
     }
 
     return {
-      name,
-      aliases,
-      shortName,
+      action: result as "merge" | "merge-with-coords" | "save" | "cancel",
+      venues: venuesToUpdate,
     };
   }
 
-  async featureClicked(args: {
+  private async createOrUpdateVenue(args: {
     wmeSDK: WmeSDK;
-    featureId: string | number;
-  }): Promise<void> {
-    const { wmeSDK, featureId } = args;
-    const stop = this.features.get(featureId) as TransportStop;
+    venuesToUpdate: Array<VenueLike & { _updateCoordinates?: boolean }>;
+    lon: number;
+    lat: number;
+    name: string;
+    aliases: string[];
+    categories: string[];
+  }): Promise<Array<VenueLike & { _updateCoordinates?: boolean }>> {
+    const { wmeSDK, venuesToUpdate, lon, lat, name, aliases, categories } =
+      args;
 
-    const stopLonLat = this.stopLonLat(stop);
-    if (!stopLonLat) {
-      return; // Cannot place without coordinates
-    }
-    const { lat, lon } = stopLonLat;
-    const zoomLevel = wmeSDK.Map.getZoomLevel();
+    let venues = venuesToUpdate;
 
-    // Venues are shown (and available in getAll()) only from zoom level 17
-    if (zoomLevel < 17) {
-      wmeSDK.Map.setMapCenter({ lonLat: { lat, lon }, zoomLevel: 17 });
-      this.render({ wmeSDK });
-      return;
-    }
-
-    // Try to find if a venue exists with the designation, in a radius of 75 m.
-    const { name, shortName, aliases } = this.recordName({ record: stop });
-    const venueCategories = this.venueCategories({
-      meansoftransport: stop.meansoftransport,
-    });
-    let venues = wmeSDK.DataModel.Venues.getAll() as VenueLike[];
-
-    // First match by category intersection (train with train, bus with bus, etc.); allow TRANSPORTATION as fallback
-    venues = venues.filter((v) =>
-      v.categories.some((cat) => venueCategories.includes(cat)),
-    );
-
-    let venuesToUpdate: VenueLike[] = [];
-    if (venues.length > 0) {
-      // Use Turf.js to calculate distance and filter venues within 75m first
-      const stopPoint = point([lon, lat]);
-      venuesToUpdate = venues.filter((venue) =>
-        this.isVenueWithinRadius({
-          venue,
-          stopPoint,
-          radiusMeters: 75,
-        }),
-      );
-
-      // Then match by name similarity to avoid unrelated points
-      venuesToUpdate = venuesToUpdate.filter((r) =>
-        r.name.toLowerCase().includes(shortName.toLowerCase()),
-      );
-
-      // Only show dialog if there are actually venues nearby
-      if (venuesToUpdate.length > 0) {
-        wmeSDK.Editing.setSelection({
-          selection: {
-            ids: venuesToUpdate.map((venue) => venue.id.toString()),
-            objectType: "venue",
-          },
-        });
-
-        const result = await showWmeDialog({
-          message: `Il semble qu'il existe déjà ${venuesToUpdate.length} arrêt(s) avec ce nom.<br/>Nous les avons sélectionnés pour vous.<br/>Que voulez-vous faire?<br/>Sélectionner <pre style="display: inline;">Fusionner</pre> appliquera les informations aux anciens points sans créer le nouveau.`,
-          buttons: [
-            { label: "Fusionner", value: "merge" },
-            {
-              label: "Fusionner et mettre à jour les coordonnées",
-              value: "merge-with-coords",
-            },
-            { label: "Enregistrer le nouveau", value: "save" },
-            { label: "Annuler", value: "cancel" },
-          ],
-        });
-
-        if (result === "cancel") {
-          return;
-        } else if (result === "save") {
-          venuesToUpdate = [];
-        } else if (result === "merge-with-coords") {
-          // Mark venues to have coordinates updated
-          venuesToUpdate = venuesToUpdate.map((v) => ({
-            ...v,
-            _updateCoordinates: true,
-          }));
-        }
-      }
-    }
-
-    const geometry = {
-      type: "Point" as const,
-      coordinates: [lon, lat] as [number, number],
-    };
-
-    const venue = {
-      category: "TRANSPORTATION" as const,
-      geometry,
-    };
-
-    if (venuesToUpdate.length === 0) {
-      const venueId = wmeSDK.DataModel.Venues.addVenue(venue);
+    if (venues.length === 0) {
+      const geometry = {
+        type: "Point" as const,
+        coordinates: [lon, lat] as [number, number],
+      };
+      const venueId = wmeSDK.DataModel.Venues.addVenue({
+        category: "TRANSPORTATION" as const,
+        geometry,
+      });
       const newVenue = wmeSDK.DataModel.Venues.getById({
         venueId: venueId.toString(),
       });
       if (newVenue) {
-        venuesToUpdate = [newVenue];
+        venues = [newVenue as VenueLike];
       }
     }
 
-    for (const venue of venuesToUpdate) {
+    for (const venue of venues) {
       const updateArgs = {
         venueId: venue.id.toString(),
         name,
         aliases,
-        categories: venueCategories as VenueCategoryId[],
+        categories: categories as VenueCategoryId[],
         ...(venue._updateCoordinates && {
           geometry: {
             type: "Point" as const,
@@ -471,17 +265,85 @@ class PublicTransportStopsLayer extends SBBDataLayer {
       );
     }
 
+    return venues;
+  }
+
+  async featureClicked(args: {
+    wmeSDK: WmeSDK;
+    featureId: string | number;
+  }): Promise<void> {
+    const { wmeSDK, featureId } = args;
+    const stop = this.features.get(featureId) as TransportStop;
+
+    const stopLonLat = this.stopLonLat(stop);
+    if (!stopLonLat) {
+      return;
+    }
+
+    const { lat, lon } = stopLonLat;
+    const zoomLevel = wmeSDK.Map.getZoomLevel();
+
+    if (zoomLevel < 17) {
+      this.handleZoomRequired({ wmeSDK, lat, lon });
+      return;
+    }
+
+    const { name, shortName, aliases } = this.nameFormatter.formatName(stop);
+    const venueCategories = this.venueCategories({
+      meansoftransport: stop.meansoftransport,
+    });
+    const allVenues = wmeSDK.DataModel.Venues.getAll() as VenueLike[];
+    const categoryFilteredVenues = allVenues.filter((v) =>
+      v.categories.some((cat) => venueCategories.includes(cat)),
+    );
+
+    let venuesToUpdate: Array<VenueLike & { _updateCoordinates?: boolean }> =
+      [];
+
+    if (categoryFilteredVenues.length > 0) {
+      const matchingVenues = this.venueMatcher.findMatchingVenues({
+        venues: categoryFilteredVenues,
+        stopLon: lon,
+        stopLat: lat,
+        stopName: name,
+        stopShortName: shortName,
+        categories: venueCategories,
+        radiusMeters: 75,
+      });
+
+      if (matchingVenues.length > 0) {
+        const { action, venues } = await this.promptUserAction({
+          wmeSDK,
+          matchingVenues,
+        });
+
+        if (action === "cancel") {
+          return;
+        }
+
+        venuesToUpdate = venues as Array<
+          VenueLike & { _updateCoordinates?: boolean }
+        >;
+      }
+    }
+
+    const updatedVenues = await this.createOrUpdateVenue({
+      wmeSDK,
+      venuesToUpdate,
+      lon,
+      lat,
+      name,
+      aliases,
+      categories: venueCategories,
+    });
+
     wmeSDK.Editing.setSelection({
       selection: {
-        ids: venuesToUpdate.map((venue) => venue.id.toString()),
+        ids: updatedVenues.map((venue) => venue.id.toString()),
         objectType: "venue",
       },
     });
-
-    wmeSDK.Map.removeFeatureFromLayer({
-      featureId,
-      layerName: this.name,
-    });
+    this.removeFeature({ wmeSDK, featureId });
   }
 }
 

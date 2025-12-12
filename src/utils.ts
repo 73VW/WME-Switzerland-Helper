@@ -99,4 +99,20 @@ function showWmeDialog(options: DialogOptions): Promise<string> {
   });
 }
 
-export { haversineDistance, showWmeDialog };
+async function waitForMapIdle(args: {
+  wmeSDK: import("wme-sdk-typings").WmeSDK;
+  intervalMs?: number;
+  maxTries?: number;
+}): Promise<void> {
+  const { wmeSDK, intervalMs = 50, maxTries = 60 } = args;
+
+  for (let i = 0; i < maxTries; i += 1) {
+    if (!wmeSDK.State.isMapLoading()) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      return;
+    }
+    await new Promise((resolve) => setTimeout(resolve, intervalMs));
+  }
+}
+
+export { haversineDistance, showWmeDialog, waitForMapIdle };
