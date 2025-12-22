@@ -5,7 +5,7 @@
 ### WME SDK Conformance
 
 - Use `wme-sdk-typings` for all WME API interactions
-- Consult SDK documentation at https://www.waze.com/editor/sdk/index.html before implementing WME features
+- Consult SDK code in `node_modules` ([`wme-sdk-typings`](../node_modules/wme-sdk-typings/index.d.ts)) and documentation at https://www.waze.com/editor/sdk/index.html before implementing WME features
 - If information is missing from the SDK typings or documentation, inform the user immediately—do not guess or invent APIs
 - Never implement functionality that exists in established npm packages
 - The migration guide’s “Pre-SDK usage” section documents deprecated globals; do not call any of those legacy methods because they are unavailable in the current SDK
