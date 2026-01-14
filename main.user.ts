@@ -15,7 +15,13 @@ import { Layer } from "./src/layer";
 import { FeatureLayer } from "./src/featureLayer";
 import { PublicTransportStopsLayer } from "./src/publicTransportStopsLayer";
 import i18next from "./locales/i18n";
-import { SidebarSection } from "./src/sidebar";
+import {
+  SidebarSection,
+  SidebarTab,
+  Paragraph,
+  TextContent,
+  SidebarItem,
+} from "./src/sidebar";
 import { saveLayerState, isLayerEnabled } from "./src/storage";
 
 const englishScriptName = "WME Switzerland helper";
@@ -146,13 +152,69 @@ function initScript() {
   async function addScriptTab() {
     const { tabLabel, tabPane } = await wmeSDK.Sidebar.registerScriptTab();
     tabLabel.innerText = scriptName;
-    tabPane.innerHTML = `<p>${i18next.t("common:introduction", "This script adds map layers that can be activated from the right navigation bar, at the very bottom.")}</p>`;
-    tabPane.innerHTML += `<p>${i18next.t("common:readmeLink", "For more information, see the full documentation.")}</p>`;
-    const noteText = `<div><p>${i18next.t("common:swissimageUpdateText", 'This <a href ="https://map.geo.admin.ch/#/map?lang=fr&center=2638909.25,1198316.5&z=1.967&topic=swisstopo&layers=ch.swisstopo.images-swissimage-dop10.metadata&bgLayer=ch.swisstopo.pixelkarte-farbe&featureInfo=default&catalogNodes=swisstopo" target="_blank" rel="noopener noreferrer">map</a> shows when the <b>{{layer}}</b> map was updated for each region.', { layer: i18next.t("common:layers.background.swissimage") })}</div></p><p>${i18next.t("common:publicTransportStopsNote", "Public transport stops appear as orange circular icons on the map.")}</p>`;
-    tabPane.innerHTML += new SidebarSection({
+
+    const sidebarTab = new SidebarTab({ scriptName });
+
+    // Introduction paragraph
+    sidebarTab.addChild(
+      new Paragraph({
+        content: i18next.t(
+          "common:introduction",
+          "This script adds map layers that can be activated from the right navigation bar, at the very bottom.",
+        ),
+      }),
+    );
+
+    // Readme link paragraph
+    sidebarTab.addChild(
+      new Paragraph({
+        content: i18next.t(
+          "common:readmeLink",
+          "For more information, see the full documentation.",
+        ),
+        cssClass: "toto",
+      }),
+    );
+
+    // Notes section with children
+    const notesSection = new SidebarSection({
       name: i18next.t("common:note.layers.background.swissimage", "Notes"),
-      icon: "w-icon-alert-info",
-    }).render({ content: noteText });
+    });
+
+    // Swissimage update note item
+    notesSection.addChild(
+      new SidebarItem({
+        name: i18next.t(
+          "common:layers.background.swissimage",
+          "SWISSIMAGE Background",
+        ),
+        icon: "w-icon-map",
+        content: i18next.t(
+          "common:swissimageUpdateText",
+          'This <a href ="https://map.geo.admin.ch/#/map?lang=fr&center=2638909.25,1198316.5&z=1.967&topic=swisstopo&layers=ch.swisstopo.images-swissimage-dop10.metadata&bgLayer=ch.swisstopo.pixelkarte-farbe&featureInfo=default&catalogNodes=swisstopo" target="_blank" rel="noopener noreferrer">map</a> shows when the <b>{{layer}}</b> map was updated for each region.',
+          { layer: i18next.t("common:layers.background.swissimage") },
+        ),
+      }),
+    );
+
+    // Public transport stops note item
+    notesSection.addChild(
+      new SidebarItem({
+        name: i18next.t(
+          "common:layers.public_transport_stops",
+          "Public Transport Stops",
+        ),
+        icon: "w-icon-bus",
+        content: i18next.t(
+          "common:publicTransportStopsNote",
+          "Public transport stops appear as orange circular icons on the map.",
+        ),
+      }),
+    );
+
+    sidebarTab.addChild(notesSection);
+
+    tabPane.innerHTML = sidebarTab.render();
   }
 
   async function init() {

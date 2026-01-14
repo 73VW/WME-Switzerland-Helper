@@ -102,6 +102,12 @@ Alle bemerkenswerten Änderungen an diesem Projekt sind hier dokumentiert.
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### [1.2.4] - 2026-01-14
+
+#### Geändert
+
+- Seitenleiste überarbeitet, um TypeScript-Klassen für alle UI-Komponenten zu verwenden (SidebarTab, SidebarSection, SidebarItem, Paragraph, TextContent)
+
 ### [1.2.3] - 2025-12-12
 
 #### Geändert

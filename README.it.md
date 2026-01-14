@@ -102,6 +102,12 @@ Tutti i cambiamenti notevoli di questo progetto sono documentati qui.
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/spec/v2.0.0.html).
 
+### [1.2.4] - 2026-01-14
+
+#### Modificato
+
+- Barra laterale ristrutturata per utilizzare classi TypeScript per tutti i componenti UI (SidebarTab, SidebarSection, SidebarItem, Paragraph, TextContent)
+
 ### [1.2.3] - 2025-12-12
 
 #### Modificato

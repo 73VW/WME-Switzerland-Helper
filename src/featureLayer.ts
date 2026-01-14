@@ -17,7 +17,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { WmeSDK, SdkFeature, SdkFeatureStyleContext, SdkFeatureStyleRule } from "wme-sdk-typings";
+import {
+  WmeSDK,
+  SdkFeature,
+  SdkFeatureStyleContext,
+  SdkFeatureStyleRule,
+} from "wme-sdk-typings";
 import { Layer } from "./layer";
 import { waitForMapIdle } from "./utils";
 
@@ -183,7 +188,13 @@ abstract class FeatureLayer extends Layer {
     // We should check if we need to filter existing features out as well
     // because we might have changed filtering context (e.g. map venues) by zooming/panning
     const obsoleteIds = Array.from(this.visibleFeatureIds).filter(
-      (id) => !newRecordsById.has(id) || !this.shouldDrawRecord({ wmeSDK, record: this.features.get(id)!, context }),
+      (id) =>
+        !newRecordsById.has(id) ||
+        !this.shouldDrawRecord({
+          wmeSDK,
+          record: this.features.get(id)!,
+          context,
+        }),
     );
 
     for (const featureId of obsoleteIds) {

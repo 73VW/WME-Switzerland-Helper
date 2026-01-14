@@ -18,7 +18,8 @@
     "prettier": "^3.6.2",
     "tslib": "^2.7.0",
     "typescript": "^5.6.3",
-    "typescript-eslint": "^8.37.0"
+    "typescript-eslint": "^8.37.0",
+    "wme-sdk-typings": "https://web-assets.waze.com/wme_sdk_docs/production/latest/wme-sdk-typings.tgz"
   },
   "scripts": {
     "compile": "rollup -c",
@@ -43,7 +44,6 @@
     "cross-env": "^7.0.3",
     "geojson": "^0.5.0",
     "i18next": "^25.3.2",
-    "replace-in-files-cli": "^3.0.0",
-    "wme-sdk-typings": "https://web-assets.waze.com/wme_sdk_docs/production/latest/wme-sdk-typings.tgz"
+    "replace-in-files-cli": "^3.0.0"
   }
 }

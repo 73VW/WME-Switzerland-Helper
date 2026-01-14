@@ -17,7 +17,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { WmeSDK, VenueCategoryId, SdkFeature, SdkFeatureStyleRule } from "wme-sdk-typings";
+import {
+  WmeSDK,
+  VenueCategoryId,
+  SdkFeature,
+  SdkFeatureStyleRule,
+} from "wme-sdk-typings";
 import { SBBDataFetcher, SBBRecord } from "./sbbDataLayer";
 import { FeatureLayer } from "./featureLayer";
 import { showWmeDialog, waitForMapIdle } from "./utils";
@@ -51,7 +56,9 @@ class PublicTransportStopsLayer extends FeatureLayer {
     args: PublicTransportStopsLayerConstructorArgs & { wmeSDK: WmeSDK },
   ) {
     super({ ...args, wmeSDK: args.wmeSDK, minZoomLevel: 14 });
-    this.dataFetcher = new SBBDataFetcher({ dataSet: "haltestelle-haltekante" });
+    this.dataFetcher = new SBBDataFetcher({
+      dataSet: "haltestelle-haltekante",
+    });
     this.stopGeometry = new StopGeometry();
     this.nameFormatter = new StopNameFormatter();
     this.venueMatcher = new VenueMatcher();
