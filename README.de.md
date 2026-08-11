@@ -126,8 +126,6 @@ Alle bemerkenswerten Änderungen an diesem Projekt sind hier dokumentiert.
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-### [Unveröffentlicht]
-
 ### [1.5.1] - 2026-08-03
 
 #### Geändert
