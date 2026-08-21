@@ -28,7 +28,7 @@
   "streetCheck": {
     "appName": "Street names",
     "editPanelHostTitle": "Switzerland",
-    "tabNote": "Compares Waze street names against the official Swiss register and flags mismatches, with one-click fixes. Open the dedicated 🛣️ Street names tab to review the issues.",
+    "tabNote": "Compares Waze street names against the official Swiss register and flags mismatches, with one-click fixes. Open the dedicated Street names tab to review the issues.",
     "stateIdle": "Idle",
     "stateDisabled": "Script disabled",
     "stateOutsideCh": "Outside Switzerland",

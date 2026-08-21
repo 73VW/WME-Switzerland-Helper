@@ -28,7 +28,7 @@
   "streetCheck": {
     "appName": "Strassennamen",
     "editPanelHostTitle": "Schweiz",
-    "tabNote": "Vergleicht die Strassennamen in Waze mit dem amtlichen Schweizer Verzeichnis und meldet Abweichungen, mit 1-Klick-Korrektur. Öffne den eigenen Tab 🛣️ Strassennamen, um die Abweichungen zu prüfen.",
+    "tabNote": "Vergleicht die Strassennamen in Waze mit dem amtlichen Schweizer Verzeichnis und meldet Abweichungen, mit 1-Klick-Korrektur. Öffne den eigenen Tab Strassennamen, um die Abweichungen zu prüfen.",
     "stateIdle": "Bereit",
     "stateDisabled": "Skript deaktiviert",
     "stateOutsideCh": "Ausserhalb der Schweiz",

@@ -28,7 +28,7 @@
   "streetCheck": {
     "appName": "Nom des rues",
     "editPanelHostTitle": "Suisse",
-    "tabNote": "Compare les noms de rues Waze au répertoire officiel suisse et signale les écarts, avec correction en 1 clic. Ouvre l'onglet dédié 🛣️ Nom des rues pour voir les écarts.",
+    "tabNote": "Compare les noms de rues Waze au répertoire officiel suisse et signale les écarts, avec correction en 1 clic. Ouvre l'onglet dédié Nom des rues pour voir les écarts.",
     "stateIdle": "En attente",
     "stateDisabled": "Script désactivé",
     "stateOutsideCh": "Hors de Suisse",

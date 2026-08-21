@@ -28,7 +28,7 @@
   "streetCheck": {
     "appName": "Nomi delle strade",
     "editPanelHostTitle": "Svizzera",
-    "tabNote": "Confronta i nomi delle strade di Waze con il repertorio ufficiale svizzero e segnala le differenze, con correzione in 1 clic. Apri la scheda dedicata 🛣️ Nomi delle strade per esaminare le differenze.",
+    "tabNote": "Confronta i nomi delle strade di Waze con il repertorio ufficiale svizzero e segnala le differenze, con correzione in 1 clic. Apri la scheda dedicata Nomi delle strade per esaminare le differenze.",
     "stateIdle": "In attesa",
     "stateDisabled": "Script disattivato",
     "stateOutsideCh": "Fuori dalla Svizzera",
