@@ -37,6 +37,18 @@ describe("componentRules", () => {
     expect(css).toContain(".chk-subsection > summary {");
   });
 
+  /**
+   * Reported from the field: the tab showed "Act" instead of "Activé". The brand row is a
+   * flex line and the switch was the item that gave way when the sidebar ran out of room.
+   */
+  it("never lets the master switch be the item that shrinks", () => {
+    const css = componentRules("chk");
+    expect(css).toContain(".chk-brand-switch { margin-left: auto; flex-shrink: 0; }");
+    expect(css).toContain(".chk-brand-switch .chk-switch-label { white-space: nowrap; }");
+    // The row wraps rather than clipping, for the longer German titles.
+    expect(css).toMatch(/\.chk-brand \{[^}]*flex-wrap: wrap/);
+  });
+
   /** Two panels in one document must not share one animation or one class. */
   it("keeps two prefixes from colliding in the same document", () => {
     const both = componentRules("chk") + componentRules("hn");

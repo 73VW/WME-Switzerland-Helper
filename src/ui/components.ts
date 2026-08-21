@@ -43,11 +43,17 @@ export function componentRules(p: string): string {
 .${p}-muted { color: var(--${p}-muted); }
 .${p}-note { font-size: 11px; color: var(--${p}-muted); line-height: 1.4; }
 
-.${p}-brand { display: flex; align-items: center; gap: 8px; }
+/* wrap, so a long title in German pushes the switch onto its own line instead of
+   squeezing it: the sidebar is narrow and the script tab bar makes it narrower. */
+.${p}-brand { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .${p}-brand-icon { font-size: 16px; line-height: 1; }
-.${p}-brand-title { font-weight: 700; font-size: 14px; color: var(--${p}-text); }
-/* The master switch rides on the title line rather than owning a block below it. */
-.${p}-brand-switch { margin-left: auto; }
+.${p}-brand-title { font-weight: 700; font-size: 14px; color: var(--${p}-text); min-width: 0; }
+/* The master switch rides on the title line rather than owning a block below it. It never
+   shrinks and its label never breaks: it was the flex item giving way, so "Activé"
+   rendered as "Act". The title yields first now, and the row wraps before either is
+   clipped. */
+.${p}-brand-switch { margin-left: auto; flex-shrink: 0; }
+.${p}-brand-switch .${p}-switch-label { white-space: nowrap; }
 
 /* Buttons. Neutral is the default; primary carries the one positive action of the panel.
    Hover is a brightness filter rather than a second colour token to maintain. */
