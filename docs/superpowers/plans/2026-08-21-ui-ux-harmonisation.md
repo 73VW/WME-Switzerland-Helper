@@ -1262,6 +1262,13 @@ Nine top-level blocks become six. **No setting is removed** — only the level a
 
 Removing the duplicate leaves exactly one viewport-only instance, which makes the `viewportInputs` mirror moot. Delete `viewportInputs` and the loop inside `viewportOnlyToggle`, keeping the `settings.update` and the re-render.
 
+> **Correction made during execution.** The plan turned `warnLine` into a face of the status
+> line. It cannot be one: it carries data-quality caveats (truncated tiles, failed tiles,
+> lookup cap) that appear **alongside** the "done" state, not instead of it, so merging the
+> two would drop one of the two messages. It stays its own element, `hidden` while empty,
+> which costs no height in the common case. The house-number tab already works this way,
+> so keeping it also keeps the two panels identical.
+
 - [ ] **Step 2: Turn the banner into a status line**
 
 The banner keeps its element and its action button, but its default face is now quiet. In `render`, it takes `chk-banner-ok` on a complete pass and `chk-banner-error` on an error; otherwise it stays neutral. Fold `warnLine` in as a third face rather than a block of its own, matching what the importer already does.
