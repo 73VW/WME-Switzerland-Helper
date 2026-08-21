@@ -19,6 +19,21 @@ describe("tokenRules", () => {
     );
   });
 
+  /**
+   * WME's own font is `Rubik, Waze Boing, sans-serif`, loaded by WME from Google Fonts.
+   * Inheriting rather than naming it keeps the panels aligned with the editor even if Waze
+   * changes it, and costs no request. Declaring the token makes that inheritance a decision
+   * rather than an accident.
+   */
+  it("inherits the editor's font instead of naming one", () => {
+    expect(css).toContain("  --chk-font: inherit;");
+  });
+
+  it("loads no font of its own", () => {
+    expect(css).not.toContain("@import");
+    expect(css).not.toContain("fonts.googleapis.com");
+  });
+
   it.each([
     ["--chk-bg", "var(--wz-color-background, #ffffff)"],
     ["--chk-surface", "var(--wz-color-background-variant, #f4f6f8)"],

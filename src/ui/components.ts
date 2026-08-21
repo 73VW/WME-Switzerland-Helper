@@ -2,15 +2,26 @@
  * The shared look of a feature panel: switch, buttons, sections, pills, banner.
  *
  * Rules are generated for a given class prefix, so two features look identical without
- * sharing a class name, and without either having to rename anything. They are extracted
- * from the street-name checker's stylesheet, which keeps its own copy: the point is that a
- * new panel starts out matching it, not that the checker be rewritten.
+ * sharing a class name. They were extracted from the street-name checker's stylesheet, and
+ * the checker now generates them from here like everyone else: this file is the single
+ * definition, not a copy of one.
+ *
+ * A feature's own stylesheet is for what only that feature needs. If you find yourself
+ * writing a rule a second panel would want, it belongs here instead.
  *
  * Every colour goes through the tokens of `tokens.ts`, so light and dark come for free.
+ *
+ * Type scale, four sizes and three weights, so hierarchy comes from the scale rather than
+ * from a value invented per panel:
+ *
+ *   14px/700  panel title
+ *   13px/600  section title, street name
+ *   12px/400  body (the pane's own size, inherited by everything unless stated)
+ *   11px/400  secondary: pills, notes, buttons; 600 for a counter inside a pill
  */
 export function componentRules(p: string): string {
   return `
-.${p}-pane { font-size: 12px; padding: 8px; display: flex; flex-direction: column; gap: 10px; color: var(--${p}-text); }
+.${p}-pane { font-family: var(--${p}-font); font-size: 12px; padding: 8px; display: flex; flex-direction: column; gap: 10px; color: var(--${p}-text); }
 .${p}-pane button { cursor: pointer; font-family: inherit; }
 .${p}-pane :is(button, a, summary):focus-visible { outline: 2px solid var(--${p}-primary); outline-offset: 1px; }
 .${p}-pane label { display: flex; align-items: center; gap: 5px; font-weight: normal; cursor: pointer; }
@@ -19,7 +30,7 @@ export function componentRules(p: string): string {
 
 .${p}-brand { display: flex; align-items: center; gap: 8px; }
 .${p}-brand-icon { font-size: 16px; line-height: 1; }
-.${p}-brand-title { font-weight: bold; font-size: 14px; color: var(--${p}-text); }
+.${p}-brand-title { font-weight: 700; font-size: 14px; color: var(--${p}-text); }
 
 /* Buttons. Neutral is the default; primary carries the one positive action of the panel.
    Hover is a brightness filter rather than a second colour token to maintain. */
@@ -72,7 +83,7 @@ export function componentRules(p: string): string {
 
 /* Section = a box; subsection = a mere separator. They nest without a russian-doll look. */
 .${p}-section { border: 1px solid var(--${p}-border); border-radius: var(--${p}-radius); background: var(--${p}-surface); overflow: hidden; }
-.${p}-section > summary { display: flex; align-items: center; gap: 8px; padding: 8px 10px; font-weight: bold; cursor: pointer; list-style: none; color: var(--${p}-text); }
+.${p}-section > summary { display: flex; align-items: center; gap: 8px; padding: 8px 10px; font-size: 13px; font-weight: 600; cursor: pointer; list-style: none; color: var(--${p}-text); }
 .${p}-section > summary::-webkit-details-marker { display: none; }
 .${p}-section > summary::after { content: "▸"; margin-left: auto; color: var(--${p}-muted); transition: transform .15s; }
 .${p}-section[open] > summary::after { transform: rotate(90deg); }
