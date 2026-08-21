@@ -16,7 +16,7 @@ import {
   type Settings,
   type SettingsStore,
 } from "../settings";
-import { buildSubsection, el, toggleSwitch } from "../../ui/dom";
+import { buildSubsection, el, icon, toggleSwitch } from "../../ui/dom";
 import { LEGEND_KEYS } from "./format";
 
 /**
@@ -36,7 +36,7 @@ export interface SettingsPanelContext {
 export function buildSettingsPanel(ctx: SettingsPanelContext): HTMLElement {
   const details = el("details", "chk-section");
   const summary = el("summary");
-  summary.append(el("span", "chk-section-icon", "⚙️"), el("span", "", t("settingsTitle")));
+  summary.append(icon("settings", "chk-section-icon"), el("span", "", t("settingsTitle")));
   details.appendChild(summary);
   const body = el("div", "chk-section-body");
   const settings = ctx.settings.get();

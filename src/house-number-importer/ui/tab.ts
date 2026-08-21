@@ -6,7 +6,7 @@ import { LANGUAGE_CHOICES, resolveLocale, setLocale, t, type LanguagePreference 
 import { log } from "../log";
 import type { SettingsStore } from "../settings";
 import type { PointStatus } from "../status";
-import { buildSection, button, el, numberInput, toggleSwitch } from "../../ui/dom";
+import { buildSection, button, el, icon, numberInput, toggleSwitch } from "../../ui/dom";
 import { STATUS_ICONS } from "../map-layer";
 import { getStreetNameVerdict } from "../../street-check-bridge";
 import {
@@ -104,7 +104,7 @@ export class TabUI {
     const pane = el("div", "hn-pane");
 
     const brand = el("div", "hn-brand");
-    brand.append(el("span", "hn-brand-icon", "🏠"), el("span", "hn-brand-title", t("appName")));
+    brand.append(icon("home", "hn-brand-icon"), el("span", "hn-brand-title", t("appName")));
 
     this.banner.replaceChildren(this.bannerText);
     const master = el("div", "hn-master");
@@ -190,7 +190,7 @@ export class TabUI {
     if (verdict) {
       const line = el("div", `hn-verdict ${verdict.className}`);
       line.append(
-        el("span", "", verdict.className === "hn-verdict-ok" ? "✓" : "⚠️"),
+        icon(verdict.className === "hn-verdict-ok" ? "checkmark" : "warning"),
         el("span", "", verdict.text),
       );
       children.push(line);

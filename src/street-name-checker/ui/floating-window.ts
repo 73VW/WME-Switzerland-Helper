@@ -1,5 +1,5 @@
 import { t } from "../i18n";
-import { el } from "../../ui/dom";
+import { el, icon } from "../../ui/dom";
 import {
   clampRect,
   dragTo,
@@ -53,11 +53,15 @@ export class FloatingWindow {
     this.root.setAttribute("aria-label", t("appName"));
 
     this.bar = el("div", "chk-window-bar");
-    const title = el("span", "chk-window-title", `🛣️ ${t("appName")}`);
+    const title = el("span", "chk-window-title");
+    title.append(icon("road"), el("span", "", t("appName")));
 
     // Spelled out rather than a glyph: this is the way back to the sidebar, and it is
     // the only control the window carries.
-    const dockBtn = el("button", "chk-window-btn", t("dock"));
+    // Spelled out rather than a glyph: this is the way back to the sidebar, and it is
+    // the only control the window carries. The icon accompanies the label, never replaces it.
+    const dockBtn = el("button", "chk-window-btn");
+    dockBtn.append(icon("undo"), el("span", "", t("dock")));
     dockBtn.type = "button";
     dockBtn.title = t("dockTitle");
     dockBtn.addEventListener("click", () => this.callbacks.onDock());

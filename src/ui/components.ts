@@ -85,8 +85,9 @@ export function componentRules(p: string): string {
 .${p}-section { border: 1px solid var(--${p}-border); border-radius: var(--${p}-radius); background: var(--${p}-surface); overflow: hidden; }
 .${p}-section > summary { display: flex; align-items: center; gap: 8px; padding: 8px 10px; font-size: 13px; font-weight: 600; cursor: pointer; list-style: none; color: var(--${p}-text); }
 .${p}-section > summary::-webkit-details-marker { display: none; }
-.${p}-section > summary::after { content: "▸"; margin-left: auto; color: var(--${p}-muted); transition: transform .15s; }
-.${p}-section[open] > summary::after { transform: rotate(90deg); }
+/* The icon font carries both directions, so the marker is swapped rather than rotated. */
+.${p}-section > summary::after { content: "\\ea37"; font-family: "waze-web-icons"; margin-left: auto; color: var(--${p}-muted); font-size: 11px; }
+.${p}-section[open] > summary::after { content: "\\ea35"; }
 .${p}-section[open] > summary { border-bottom: 1px solid var(--${p}-border); }
 .${p}-section-icon { font-size: 14px; line-height: 1; }
 .${p}-section-body { padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; }
@@ -96,8 +97,9 @@ export function componentRules(p: string): string {
 .${p}-subsection:first-child { border-top: none; }
 .${p}-subsection > summary { display: flex; align-items: center; gap: 6px; padding: 6px 0; font-weight: 600; cursor: pointer; list-style: none; color: var(--${p}-text); }
 .${p}-subsection > summary::-webkit-details-marker { display: none; }
-.${p}-subsection > summary::after { content: "▸"; margin-left: auto; color: var(--${p}-muted); transition: transform .15s; }
-.${p}-subsection[open] > summary::after { transform: rotate(90deg); }
+/* The icon font carries both directions, so the marker is swapped rather than rotated. */
+.${p}-subsection > summary::after { content: "\\ea37"; font-family: "waze-web-icons"; margin-left: auto; color: var(--${p}-muted); font-size: 11px; }
+.${p}-subsection[open] > summary::after { content: "\\ea35"; }
 .${p}-subsection-body { padding: 4px 0 8px; display: flex; flex-direction: column; gap: 6px; }
 
 .${p}-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }

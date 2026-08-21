@@ -935,40 +935,33 @@ Icon names, all verified present in the live font (v19.2.6, a strict superset of
 | `↗` | `external-link` | the geo.admin.ch link |
 | `▸` in CSS | `chevron-right` / `chevron-down` | section markers |
 
-- [ ] **Step 1: Write the failing test**
+- [ ] **Step 1: Ban emoji with a lint rule, not a test**
 
-Add to `src/street-name-checker/ui/tab.test.ts`:
+> **Correction made during execution.** The plan asked for a vitest case reading each source
+> file with `node:fs`. The repo has no `@types/node`, so `tsc --noEmit` rejects the import
+> even though vitest runs it happily — the failure only shows up in the verification loop.
+> Adding `@types/node` is a dependency decision, and a hardcoded list of files to scan rots.
+> An ESLint rule is the right tool: it covers every file in the two directories, including
+> ones nobody has written yet, and it already runs in the loop.
 
-```ts
-import { readFileSync } from "node:fs";
+Append to `eslint.config.mjs`, after `tseslint.configs.recommended`, a config block scoped
+to `src/street-name-checker/**/*.ts` and `src/house-number-importer/**/*.ts` (tests
+excluded) that sets `no-restricted-syntax` against two selectors:
 
-/**
- * Emoji render at a size and a weight the OS decides, ignore the dark skin, and differ
- * between Windows, macOS and Linux. The Waze icon font is already loaded by WME, follows
- * the text colour, and looks the same for every editor.
- */
-describe("iconography", () => {
-  const sources = [
-    "src/street-name-checker/ui/tab.ts",
-    "src/street-name-checker/ui/settings-panel.ts",
-    "src/street-name-checker/ui/edit-panel.ts",
-    "src/street-name-checker/ui/floating-window.ts",
-    "src/house-number-importer/ui/tab.ts",
-    "src/house-number-importer/ui/edit-panel.ts",
-  ];
-
-  it.each(sources)("%s carries no emoji in its UI strings", (path) => {
-    const source = readFileSync(path, "utf8");
-    // Pictographic ranges only: accented Latin and the arrows used in names stay legal.
-    expect(source).not.toMatch(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/u);
-  });
-});
+```js
+"Literal[value=/[\\u{1F300}-\\u{1FAFF}\\u{2600}-\\u{27BF}]/u]"
+"TemplateElement[value.raw=/[\\u{1F300}-\\u{1FAFF}\\u{2600}-\\u{27BF}]/u]"
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+with the message `No emoji in the interface: use icon("name") from src/ui/dom.ts (Waze icon
+font).` Do not put `\u{FE0F}` in the class: it is a combining variation selector and
+`no-misleading-character-class` rejects it. Banning the base pictographs is enough.
 
-Run: `npx vitest run src/street-name-checker/ui/tab.test.ts`
-Expected: FAIL on every one of the six files.
+- [ ] **Step 2: Prove the rule fires**
+
+Plant `const CANARY = "🏠 test";` in `src/house-number-importer/ui/tab.ts`, run
+`npx eslint src/house-number-importer/ui/tab.ts`, confirm the error, then remove it. A lint
+rule that never fires is worse than none: it reads as protection that is not there.
 
 - [ ] **Step 3: Replace the emoji**
 

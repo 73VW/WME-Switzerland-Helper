@@ -3,7 +3,7 @@ import type { Controller, Snapshot } from "../controller";
 import { isImportInFlight } from "../import";
 import { log } from "../log";
 import type { SettingsStore } from "../settings";
-import { button, el } from "../../ui/dom";
+import { button, el, icon } from "../../ui/dom";
 import { getStreetNameVerdict } from "../../street-check-bridge";
 import {
   canBulkImport,
@@ -98,8 +98,11 @@ export class EditPanelBox {
   }
 
   private render(container: HTMLElement, snapshot: Snapshot): void {
+    const street = el("div", "hn-street");
+    street.append(icon("home"), el("span", "", snapshot.streetName || "?"));
+
     const children: HTMLElement[] = [
-      el("div", "hn-street", `🏠 ${snapshot.streetName || "?"}`),
+      street,
       el("div", "hn-note", formatCounts(countByStatus(snapshot.points))),
     ];
 

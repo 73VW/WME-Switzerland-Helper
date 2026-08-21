@@ -19,7 +19,7 @@ import { getLocale } from "../i18n";
 import { cantonMapLink } from "./canton-link";
 import { groupScriptTab, tabLabelText } from "../../ui/tab-group";
 import { applyThemeClass, watchTheme } from "../../ui/theme";
-import { el, toggleSwitch } from "../../ui/dom";
+import { el, icon, toggleSwitch } from "../../ui/dom";
 import {
   bboxOfIssues,
   formatNote,
@@ -27,7 +27,6 @@ import {
   groupIssues,
   LEGEND_KEYS,
   STATE_KEYS,
-  statusEmoji,
   type IssueGroup,
 } from "./format";
 import { buildSettingsPanel } from "./settings-panel";
@@ -190,7 +189,7 @@ export class TabUI {
 
     const brand = el("div", "chk-brand");
     brand.append(
-      el("span", "chk-brand-icon", "🛣️"),
+      icon("road", "chk-brand-icon"),
       el("span", "chk-brand-title", t("appName")),
     );
 
@@ -349,7 +348,7 @@ export class TabUI {
   private buildLegend(): HTMLElement {
     const details = el("details", "chk-section");
     const summary = el("summary");
-    summary.append(el("span", "chk-section-icon", "🎨"), el("span", "", t("legendTitle")));
+    summary.append(icon("layers", "chk-section-icon"), el("span", "", t("legendTitle")));
     details.appendChild(summary);
     const body = el("div", "chk-section-body");
     for (const status of Object.keys(STATUS_STYLES) as IssueStatus[]) {
@@ -553,8 +552,9 @@ export class TabUI {
     const names = el("button", "chk-group-names chk-plain");
     const expanded = this.expandedGroups.has(group.key) || group.issues.length === 1;
     names.setAttribute("aria-expanded", String(expanded));
-    const emoji = statusEmoji(group.status);
-    if (emoji) names.appendChild(el("span", "", `${emoji} `));
+    // WRONG_STREET is the one verdict derived from geometry rather than from name
+    // similarity, and the one that always asks for confirmation. It keeps a marker.
+    if (group.status === "WRONG_STREET") names.appendChild(icon("warning", "chk-status-warn"));
     names.appendChild(el("span", "", group.currentName ?? t("unnamed")));
     if (group.suggestion && group.suggestion !== group.currentName) {
       names.appendChild(el("span", "chk-arrow", "  →  "));

@@ -104,6 +104,9 @@ ${statusDotRules()}
 .chk-status { display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; }
 .chk-status-code { font-size: 10px; font-weight: 600; color: var(--chk-muted); }
 .chk-group-names { overflow-wrap: break-word; }
+/* The geometric verdict keeps a visible marker in the group name; warn colour, not the
+   text colour, so it reads as a caution rather than as part of the street name. */
+.chk-status-warn { color: var(--chk-warn); margin-right: 4px; }
 .chk-arrow { color: var(--chk-muted); }
 .chk-suggestion { font-weight: bold; color: var(--chk-primary); }
 .chk-note { color: var(--chk-muted); font-style: italic; }

@@ -46,10 +46,6 @@ export const STATE_KEYS: Record<ScanSnapshot["state"], StringKey> = {
 
 /** Leading emoji for a status, or "" when none. WRONG_STREET is flagged: a different
  *  official street runs under a validly-named segment, easy to miss in the list. */
-export function statusEmoji(status: IssueStatus): string {
-  return status === "WRONG_STREET" ? "⚠️" : "";
-}
-
 export function formatNote(note: IssueNote | null): string {
   if (!note) return "";
   const parts: string[] = [];
