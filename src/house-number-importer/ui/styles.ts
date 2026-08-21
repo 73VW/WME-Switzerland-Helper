@@ -18,7 +18,6 @@ ${componentRules("hn")}
 .hn-selection { display: flex; flex-direction: column; gap: 6px; }
 .hn-legend { display: flex; flex-direction: column; gap: 5px; }
 .hn-legend-row { display: flex; align-items: center; gap: 8px; }
-.hn-note { font-size: 11px; color: var(--hn-muted); }
 /* Overrides the generic 8px dot: these carry a pictogram, which needs the room. */
 .hn-dot { width: 13px; height: 13px; }
 `;

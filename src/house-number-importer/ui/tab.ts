@@ -106,25 +106,26 @@ export class TabUI {
     const brand = el("div", "hn-brand");
     brand.append(icon("home", "hn-brand-icon"), el("span", "hn-brand-title", t("appName")));
 
-    this.banner.replaceChildren(this.bannerText);
-    const master = el("div", "hn-master");
+    // The master switch rides on the title line, as in the street-name tab.
     const enabledToggle = toggleSwitch("hn", t("enable"), settings.enabled, (checked) =>
       this.onEnabledChange(checked),
     );
+    enabledToggle.classList.add("hn-brand-switch");
     this.enabledInput = enabledToggle.querySelector("input");
-    master.appendChild(enabledToggle);
+    brand.appendChild(enabledToggle);
 
+    this.banner.replaceChildren(this.bannerText);
+
+    // Five blocks, matching the street-name tab one for one. `warning` is a sibling of the
+    // banner rather than a face of it: a data caveat shows alongside the state, not
+    // instead of it, and it stays hidden while empty.
     pane.append(
       brand,
-      el("div", "hn-note", t("tabNote")),
       this.banner,
-      master,
       this.warning,
       this.selection,
       this.actionRow,
-      this.secondaryActions(),
       this.settingsSection(),
-      this.legendSection(),
     );
     this.tabPane.replaceChildren(pane);
   }
@@ -263,7 +264,12 @@ export class TabUI {
     });
     languageRow.append(el("span", "", t("settingsLanguage")), select);
 
-    return buildSection("hn", "settings", t("settingsTitle"), [
+    return buildSection("hn", "settings", t("settingsAndHelp"), [
+      // What the feature is. It used to be the tab's second block, permanently on screen;
+      // unlike the street-name checker, this feature has no note in the main sidebar, so
+      // dropping it would leave a first-time editor with nothing explaining the tab.
+      el("div", "hn-note", t("tabNote")),
+      this.secondaryActions(),
       zoomRow,
       toggleSwitch("hn", t("settingsShowLabels"), settings.showMapLabels, (showMapLabels) => {
         this.settings.update({ showMapLabels });
@@ -290,18 +296,10 @@ export class TabUI {
         (confirmSingleImport) => this.settings.update({ confirmSingleImport }),
       ),
       languageRow,
+      // The pills carry the legend already, with a counter on top. This only covers the
+      // statuses the current selection happens not to contain.
+      el("div", "hn-note", t("legendNote")),
     ]);
-  }
-
-  private legendSection(): HTMLElement {
-    const legend = el("div", "hn-legend");
-    for (const status of Object.keys(LEGEND_KEYS) as PointStatus[]) {
-      const row = el("div", "hn-legend-row");
-      row.append(dot(status), el("span", "", t(LEGEND_KEYS[status])));
-      legend.appendChild(row);
-    }
-    // Open by default: it is four lines, and it is what makes the map readable at a glance.
-    return buildSection("hn", "layers", t("legendTitle"), [legend], true);
   }
 
   /**

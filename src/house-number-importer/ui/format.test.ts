@@ -4,7 +4,9 @@ import type { Assignment } from "../assign";
 import type { GwrPoint } from "../gwr/types";
 import { IMPORT_CAP } from "../import";
 import type { StatusedPoint } from "../status";
-import { canBulkImport, countByStatus, formatImportButton, formatState } from "./format";
+import { canBulkImport, countByStatus, formatImportButton, formatState, LEGEND_KEYS } from "./format";
+import { setLocale, t, type LocaleCode } from "../i18n";
+import type { PointStatus } from "../status";
 
 const at = (p: GwrPoint): Assignment => ({
   point: p,
@@ -106,5 +108,49 @@ describe("canBulkImport", () => {
     // "N missing" would be a lower bound, and the button would promise a completeness the
     // data does not have.
     expect(canBulkImport(snapshot({ truncated: true, missing: [at(point("2"))] }))).toBe(false);
+  });
+});
+
+/**
+ * Flattening the tab moved controls between blocks. These hold the inventory: nothing was
+ * dropped on the way, and the legend's information survives its section.
+ *
+ * They read the i18n bundle rather than the sources: the repo has no @types/node, and a
+ * key that goes missing is the failure that matters.
+ */
+describe("flattened tab inventory", () => {
+  const LOCALES: LocaleCode[] = ["en", "fr", "de", "it"];
+
+  it.each(LOCALES)("keeps every control's label in %s", (locale) => {
+    setLocale(locale);
+    for (const key of [
+      "enable",
+      "settingsMinZoom",
+      "settingsShowLabels",
+      "settingsStrictMatch",
+      "settingsExistingOnly",
+      "settingsConfirmSingle",
+      "settingsLanguage",
+      "btnRefreshExisting",
+      "btnClearCache",
+      "settingsAndHelp",
+      "legendNote",
+      // The only explanation of what this feature does: the main sidebar has a note for
+      // the street-name checker but none for this one, so this string carries it alone.
+      "tabNote",
+    ] as const) {
+      const text = t(key);
+      expect(text, `${key} in ${locale}`).not.toBe(key);
+      expect(text, `${key} in ${locale}`).not.toBe("");
+    }
+    setLocale("en");
+  });
+
+  it.each(LOCALES)("still names every status, now only in the pills, in %s", (locale) => {
+    setLocale(locale);
+    for (const status of Object.keys(LEGEND_KEYS) as PointStatus[]) {
+      expect(t(LEGEND_KEYS[status]), `${status} in ${locale}`).not.toBe(LEGEND_KEYS[status]);
+    }
+    setLocale("en");
   });
 });

@@ -222,6 +222,8 @@
     "legendNeutral": "No street selected",
     "tooltipPresentFar": "{{number}} exists, but {{distance}} m away",
     "settingsTitle": "Settings",
+    "settingsAndHelp": "Settings and help",
+    "legendNote": "Statuses absent from the selection are not listed above.",
     "settingsMinZoom": "Minimum zoom",
     "settingsShowLabels": "Show numbers on the map",
     "settingsStrictMatch": "Strict street-name matching",

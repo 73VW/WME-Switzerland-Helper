@@ -27,6 +27,7 @@ export function componentRules(p: string): string {
 .${p}-pane label { display: flex; align-items: center; gap: 5px; font-weight: normal; cursor: pointer; }
 .${p}-pane select, .${p}-pane input[type="number"] { background: var(--${p}-bg); color: var(--${p}-text); border: 1px solid var(--${p}-border); border-radius: 5px; padding: 2px 5px; font-size: 11px; }
 .${p}-muted { color: var(--${p}-muted); }
+.${p}-note { font-size: 11px; color: var(--${p}-muted); line-height: 1.4; }
 
 .${p}-brand { display: flex; align-items: center; gap: 8px; }
 .${p}-brand-icon { font-size: 16px; line-height: 1; }

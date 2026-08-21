@@ -222,6 +222,8 @@
     "legendNeutral": "Keine Strasse ausgewählt",
     "tooltipPresentFar": "{{number}} existiert, aber {{distance}} m entfernt",
     "settingsTitle": "Einstellungen",
+    "settingsAndHelp": "Einstellungen und Hilfe",
+    "legendNote": "Nicht in der Auswahl vorhandene Status werden oben nicht aufgeführt.",
     "settingsMinZoom": "Mindest-Zoom",
     "settingsShowLabels": "Nummern auf der Karte anzeigen",
     "settingsStrictMatch": "Strikter Abgleich der Strassennamen",

@@ -222,6 +222,8 @@
     "legendNeutral": "Nessuna via selezionata",
     "tooltipPresentFar": "{{number}} esiste, ma a {{distance}} m",
     "settingsTitle": "Impostazioni",
+    "settingsAndHelp": "Impostazioni e aiuto",
+    "legendNote": "Gli stati assenti dalla selezione non sono elencati sopra.",
     "settingsMinZoom": "Zoom minimo",
     "settingsShowLabels": "Mostrare i numeri sulla mappa",
     "settingsStrictMatch": "Corrispondenza rigorosa dei nomi delle vie",
