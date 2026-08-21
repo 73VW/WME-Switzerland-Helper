@@ -19,6 +19,12 @@
 - **Colour is never the sole carrier of a status.** Every dot stays next to a label.
 - **Four languages, always.** Any new string goes into `locales/en/common.json`, `locales/fr/common.json`, `locales/de/common.json`, `locales/it/common.json` in the same commit.
 - **Tests run in Node with no DOM.** Follow the repo's precedent (`src/ui/tab-group.test.ts`, `geoadmin/idb-store.test.ts`): pure logic in pure functions, hand-rolled minimal doubles for the rest. Do **not** add jsdom.
+- **Never run Prettier.** `npm run watch` calls `prettier --write .`, but the repo has **no
+  Prettier config** and **81 files under `src/` do not satisfy its defaults**. The real house
+  style is wider than the default 80 columns. Running `prettier --write` on a file you touch
+  reformats every unrelated line in it and buries your change in noise. Match the
+  surrounding code by hand instead. (Learned the hard way in Task 2: it rewrapped a
+  five-name import that had nothing to do with the change.)
 - **Commits:** Conventional Commits, English, imperative subject. **No `Co-Authored-By: Claude` trailer, no "Generated with Claude Code" anywhere.**
 - **Never push to `main`.** Work stays on `refactor/ui-ux-improvements`. Do not push or open a PR without the user's explicit go.
 
@@ -476,63 +482,33 @@ tab-group.test.ts rather than adding jsdom."
 
 **Files:**
 - Delete: `src/house-number-importer/ui/dom.ts`
-- Modify: `src/house-number-importer/ui/format.ts` (receives `dot`)
-- Modify: `src/house-number-importer/ui/tab.ts`, `src/house-number-importer/ui/edit-panel.ts`
-- Test: `src/house-number-importer/ui/format.test.ts`
+- Modify: `src/house-number-importer/ui/tab.ts` (receives `dot`), `src/house-number-importer/ui/edit-panel.ts`
 
 **Interfaces:**
 - Consumes: `el`, `button`, `numberInput`, `toggleSwitch`, `buildSection` from `src/ui/dom.ts` (Task 1).
-- Produces: `export function dot(status: PointStatus): HTMLElement` now lives in `src/house-number-importer/ui/format.ts`.
+- Produces: `dot(status: PointStatus): HTMLElement` becomes a module-private function of `src/house-number-importer/ui/tab.ts`.
+
+> **Correction made during execution.** The plan first sent `dot()` to `ui/format.ts`. That
+> file opens with an explicit contract — *"Presentation logic with no DOM, so it can be
+> tested in the repo's Node environment. Anything touching elements stays in tab.ts"* — and
+> `dot()` builds an `<img>`. `tab.ts` is its only caller (twice, one of which Task 9
+> deletes), so it goes there and the contract holds. No test is added: the function is three
+> lines over `STATUS_ICONS`, and testing it would mean installing the DOM double to assert
+> a lookup that `map-layer.ts` already owns.
 
 The importer is migrated first: it is the smaller of the two and already uses `componentRules("hn")`, so a break shows up immediately.
 
-- [ ] **Step 1: Write the failing test**
+- [ ] **Step 1: Move `dot` into `tab.ts`**
 
-Append to `src/house-number-importer/ui/format.test.ts`:
-
-```ts
-import { installFakeDocument, type FakeNode } from "../../ui/fake-dom";
-import { dot } from "./format";
-import { STATUS_ICONS } from "../map-layer";
-
-describe("dot", () => {
-  let restore: () => void;
-  beforeEach(() => {
-    restore = installFakeDocument();
-  });
-  afterEach(() => restore());
-
-  it("draws the exact image the map draws, so a pill cannot drift from its point", () => {
-    const node = dot("MISSING") as unknown as FakeNode & { src: string; alt: string };
-    expect(node.tagName).toBe("img");
-    expect(node.src).toBe(STATUS_ICONS.MISSING);
-  });
-
-  it("has an empty alt: it never carries a meaning on its own", () => {
-    const node = dot("PRESENT") as unknown as FakeNode & { alt: string };
-    expect(node.alt).toBe("");
-  });
-});
-```
-
-Add `beforeEach`, `afterEach` to the existing `vitest` import at the top of the file.
-
-- [ ] **Step 2: Run the test to verify it fails**
-
-Run: `npx vitest run src/house-number-importer/ui/format.test.ts`
-Expected: FAIL — `dot` is not exported from `./format`.
-
-- [ ] **Step 3: Move `dot` into `format.ts`**
-
-Cut the `dot()` function and its doc comment from `src/house-number-importer/ui/dom.ts`, paste it at the end of `src/house-number-importer/ui/format.ts`, and add its imports there:
+Cut the `dot()` function and its doc comment from `src/house-number-importer/ui/dom.ts` and
+paste it into `src/house-number-importer/ui/tab.ts`, above the `TabUI` class, without the
+`export` keyword. Add `STATUS_ICONS` to the imports there:
 
 ```ts
-import { el } from "../../ui/dom";
 import { STATUS_ICONS } from "../map-layer";
-import type { PointStatus } from "../status";
 ```
 
-- [ ] **Step 4: Delete the feature's `dom.ts` and repoint its importers**
+- [ ] **Step 2: Delete the feature's `dom.ts` and repoint its importers**
 
 ```bash
 rm src/house-number-importer/ui/dom.ts
@@ -564,7 +540,7 @@ with
 import { button, el } from "../../ui/dom";
 ```
 
-- [ ] **Step 5: Adapt every call site to the new signatures**
+- [ ] **Step 3: Adapt every call site to the new signatures**
 
 `toggleSwitch`, `buildSection` and `buildSubsection` now take the prefix first, and `buildSection` takes an icon **name** rather than an emoji. In `tab.ts`:
 
@@ -576,25 +552,26 @@ import { button, el } from "../../ui/dom";
 
 `button()` no longer defaults to `"hn-btn"`. Every bare `button(text, cb)` becomes `button(text, cb, "hn-btn")`; the calls that already pass `"hn-btn hn-btn-primary"` are unchanged.
 
-- [ ] **Step 6: Run the tests**
+- [ ] **Step 4: Run the tests**
 
 Run: `npx vitest run src/house-number-importer`
-Expected: PASS, including the two new `dot` tests.
+Expected: PASS, at the count it had before this task. Nothing is added here: this task moves
+code, it does not introduce behaviour.
 
-- [ ] **Step 7: Run the full verification loop**
+- [ ] **Step 5: Run the full verification loop**
 
 ```bash
 npx tsc --noEmit && npx vitest run src/ui src/street-name-checker src/house-number-importer && npx eslint src/ui src/street-name-checker src/house-number-importer && npx rollup -c
 ```
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
 git add -A src/house-number-importer
 git commit -m "refactor(house-number-importer): use the shared DOM builders" \
-  -m "dot() moves to ui/format.ts, where it belongs: it reads the feature's own
-STATUS_ICONS, so it was the one builder that had no business in a shared module.
-Everything else comes from src/ui/dom.ts now."
+  -m "dot() moves into tab.ts, its only caller: it reads the feature's own
+STATUS_ICONS, so it was the one builder with no business in a shared module, and
+ui/format.ts states it holds no DOM. Everything else comes from src/ui/dom.ts."
 ```
 
 ---

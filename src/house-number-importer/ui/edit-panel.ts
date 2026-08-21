@@ -3,7 +3,7 @@ import type { Controller, Snapshot } from "../controller";
 import { isImportInFlight } from "../import";
 import { log } from "../log";
 import type { SettingsStore } from "../settings";
-import { button, el } from "./dom";
+import { button, el } from "../../ui/dom";
 import { getStreetNameVerdict } from "../../street-check-bridge";
 import {
   canBulkImport,
