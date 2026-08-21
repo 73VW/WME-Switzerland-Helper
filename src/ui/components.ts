@@ -64,6 +64,9 @@ export function componentRules(p: string): string {
    to a label. */
 .${p}-pills { display: flex; flex-wrap: wrap; gap: 5px; }
 .${p}-pill { display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--${p}-border); border-radius: 12px; padding: 2px 9px; background: var(--${p}-surface); color: var(--${p}-text); font-size: 11px; }
+.${p}-pill:hover { border-color: var(--${p}-primary); }
+/* Pressed state, for the panels where the pill is a filter rather than a mere counter. */
+.${p}-pill-active { border-color: var(--${p}-primary); background: var(--${p}-info-bg); color: var(--${p}-primary); font-weight: 600; }
 .${p}-pill-value { font-weight: 600; font-variant-numeric: tabular-nums; }
 .${p}-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
@@ -77,7 +80,24 @@ export function componentRules(p: string): string {
 .${p}-section-icon { font-size: 14px; line-height: 1; }
 .${p}-section-body { padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; }
 
+/* A subsection separates without boxing, so nesting one in a section stays flat. */
+.${p}-subsection { border-top: 1px solid var(--${p}-border); }
+.${p}-subsection:first-child { border-top: none; }
+.${p}-subsection > summary { display: flex; align-items: center; gap: 6px; padding: 6px 0; font-weight: 600; cursor: pointer; list-style: none; color: var(--${p}-text); }
+.${p}-subsection > summary::-webkit-details-marker { display: none; }
+.${p}-subsection > summary::after { content: "▸"; margin-left: auto; color: var(--${p}-muted); transition: transform .15s; }
+.${p}-subsection[open] > summary::after { transform: rotate(90deg); }
+.${p}-subsection-body { padding: 4px 0 8px; display: flex; flex-direction: column; gap: 6px; }
+
 .${p}-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .${p}-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+/* Busy veil: covers the list in place while it reloads, so the panel does not jump. The
+   keyframes are prefixed too, or two features in one document would share one animation. */
+.${p}-busy { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 8px; z-index: 5; border-radius: var(--${p}-radius); background: color-mix(in srgb, var(--${p}-bg) 55%, transparent); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
+.${p}-busy-active .${p}-busy { display: flex; }
+.${p}-busy-text { font-size: 12px; font-weight: 600; color: var(--${p}-text); }
+.${p}-spinner { width: 26px; height: 26px; border: 3px solid var(--${p}-border); border-top-color: var(--${p}-primary); border-radius: 50%; animation: ${p}-spin .8s linear infinite; }
+@keyframes ${p}-spin { to { transform: rotate(360deg); } }
 `;
 }

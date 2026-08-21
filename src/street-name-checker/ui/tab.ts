@@ -217,7 +217,7 @@ export class TabUI {
     this.statusLine.append(this.statusText, this.bannerBtn);
     this.warnLine = el("div", "chk-warn");
     this.warnLine.hidden = true;
-    this.chipsBox = el("div", "chk-chips");
+    this.chipsBox = el("div", "chk-pills");
     this.groupsBox = el("div", "chk-groups");
     this.listBox = el("div", "chk-list");
     const busy = el("div", "chk-busy");
@@ -392,7 +392,7 @@ export class TabUI {
     }
     if (state === "error" && error) statusText += `: ${error}`;
     this.statusText.textContent = statusText;
-    this.statusLine.classList.toggle("chk-error", state === "error");
+    this.statusLine.classList.toggle("chk-banner-error", state === "error");
     this.statusLine.classList.toggle("chk-banner-ok", state === "done" && inViewport.length === 0);
     this.renderBannerButton(snapshot);
     this.renderWarnings(snapshot);
@@ -502,8 +502,8 @@ export class TabUI {
     for (const status of Object.keys(STATUS_STYLES) as IssueStatus[]) {
       const count = counts.get(status) ?? 0;
       if (count === 0) continue;
-      const chip = el("button", "chk-chip");
-      chip.classList.toggle("chk-chip-active", this.activeFilters.has(status));
+      const chip = el("button", "chk-pill");
+      chip.classList.toggle("chk-pill-active", this.activeFilters.has(status));
       chip.setAttribute("aria-pressed", String(this.activeFilters.has(status)));
       const dot = el("span", "chk-dot");
       dot.style.background = STATUS_STYLES[status].strokeColor;
@@ -545,12 +545,12 @@ export class TabUI {
     // dot + visible status code (same pattern as the chips), so the status is
     // not conveyed by color alone
     const badge = el("span", "chk-status");
-    badge.append(el("span", `chk-badge chk-badge-${group.status}`), el("span", "chk-status-code", group.status));
+    badge.append(el("span", `chk-dot chk-dot-${group.status}`), el("span", "chk-status-code", group.status));
 
     const noteText = formatNote(group.note);
     // a real button (styled as plain text) so expand/collapse works with the
     // keyboard; its click bubbles to the header listener below
-    const names = el("button", "chk-group-names chk-group-toggle");
+    const names = el("button", "chk-group-names chk-plain");
     const expanded = this.expandedGroups.has(group.key) || group.issues.length === 1;
     names.setAttribute("aria-expanded", String(expanded));
     const emoji = statusEmoji(group.status);
@@ -640,7 +640,7 @@ export class TabUI {
     // bubbles to the row listener below
     const meta = el(
       "button",
-      "chk-row-meta chk-row-select",
+      "chk-row-meta chk-plain",
       `${ROAD_TYPE_LABELS.get(issue.roadType) ?? `type ${issue.roadType}`} · ${Math.round(issue.length)} m${issue.cityName ? ` · ${issue.cityName}` : ""}`,
     );
     row.appendChild(meta);

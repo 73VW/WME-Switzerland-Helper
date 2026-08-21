@@ -4,6 +4,8 @@ import type { Issue, IssueStatus } from "../matching/evaluate";
 import { isDarkBackground } from "../../ui/theme";
 import { bboxOfIssues, formatNote, groupIssues } from "../ui/format";
 import { setLocale } from "../i18n";
+import { STATUS_STYLES } from "../map-layer";
+import { statusDotRules } from "../ui/styles";
 
 const GEOMETRY: LineString = {
   type: "LineString",
@@ -132,5 +134,26 @@ describe("isDarkBackground", () => {
     expect(isDarkBackground("rgba(0, 0, 0, 0)")).toBeNull();
     expect(isDarkBackground("transparent")).toBeNull();
     expect(isDarkBackground("")).toBeNull();
+  });
+});
+
+describe("statusDotRules", () => {
+  /**
+   * `styles.ts` writes `.chk-dot-<STATUS>` and `tab.ts` builds `chk-dot-${group.status}`.
+   * Nothing types that link, so a rename on one side alone would leave every status dot
+   * with no background and no error anywhere.
+   */
+  it("emits one background rule per status the map can draw", () => {
+    const css = statusDotRules();
+    for (const status of Object.keys(STATUS_STYLES) as IssueStatus[]) {
+      expect(css, status).toContain(
+        `.chk-dot-${status} { background: ${STATUS_STYLES[status].strokeColor}; }`,
+      );
+    }
+  });
+
+  it("matches the class tab.ts builds for a group", () => {
+    // Mirrors `el("span", `chk-dot chk-dot-${group.status}`)` in renderGroup.
+    expect(statusDotRules()).toContain(".chk-dot-WRONG_STREET {");
   });
 });
