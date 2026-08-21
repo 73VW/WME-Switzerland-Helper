@@ -606,7 +606,21 @@ In each file, change `from "./dom"` to `from "../../ui/dom"`.
 
 Every `toggleSwitch(text, checked, cb, title)` becomes `toggleSwitch("chk", text, checked, cb, title)`. There are three construction points: `buildMasterToggles`, `viewportOnlyToggle` (`tab.ts`) and the toggles inside `buildSettingsPanel` (`settings-panel.ts`).
 
-Every `buildSubsection("⚙️", title, children)` becomes `buildSubsection("chk", "settings", title, children)`; pick the icon name per subsection from the table in Task 6.
+The four `buildSubsection` calls in `settings-panel.ts` pass an emoji today, and the new
+signature takes an icon **name**. They therefore convert here rather than in Task 6 — the
+signature forces it, there is no intermediate state:
+
+| Subsection | Emoji today | Icon |
+| --- | --- | --- |
+| `roadTypesLabel` | 🛣️ | `road` |
+| `statusesLabel` | 🏷️ | `filter` |
+| `optionsLabel` | 🎛️ | `list` |
+| `scopeDisplayLabel` | 📍 | `location` |
+
+> **Correction made during execution.** The plan listed five importers of the checker's
+> `dom.ts`. There are three: `ui/tab.ts`, `ui/settings-panel.ts`, `ui/floating-window.ts`.
+> `ui/edit-panel.ts` and `ui/canton-link.ts` call `document.createElement` directly and are
+> untouched by this task.
 
 - [ ] **Step 4: Run the tests**
 

@@ -19,7 +19,7 @@ import { getLocale } from "../i18n";
 import { cantonMapLink } from "./canton-link";
 import { groupScriptTab, tabLabelText } from "../../ui/tab-group";
 import { applyThemeClass, watchTheme } from "../../ui/theme";
-import { el, toggleSwitch } from "./dom";
+import { el, toggleSwitch } from "../../ui/dom";
 import {
   bboxOfIssues,
   formatNote,
@@ -275,6 +275,7 @@ export class TabUI {
     const row = el("div", "chk-master");
     const settings = this.settings.get();
     const enabledToggle = toggleSwitch(
+      "chk",
       t("toggleEnabled"),
       settings.enabled,
       (checked) => this.onEnabledChange(checked),
@@ -284,6 +285,7 @@ export class TabUI {
     row.append(
       enabledToggle,
       toggleSwitch(
+        "chk",
         t("toggleAutoScan"),
         settings.autoScan,
         (checked) => {
@@ -314,6 +316,7 @@ export class TabUI {
    */
   private viewportOnlyToggle(): HTMLElement {
     const label = toggleSwitch(
+      "chk",
       t("viewportOnly"),
       this.settings.get().viewportOnly,
       (checked) => {

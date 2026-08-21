@@ -1,5 +1,5 @@
 import { t } from "../i18n";
-import { el } from "./dom";
+import { el } from "../../ui/dom";
 import {
   clampRect,
   dragTo,

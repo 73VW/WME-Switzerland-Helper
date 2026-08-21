@@ -16,7 +16,7 @@ import {
   type Settings,
   type SettingsStore,
 } from "../settings";
-import { buildSubsection, el, toggleSwitch } from "./dom";
+import { buildSubsection, el, toggleSwitch } from "../../ui/dom";
 import { LEGEND_KEYS } from "./format";
 
 /**
@@ -98,6 +98,7 @@ export function buildSettingsPanel(ctx: SettingsPanelContext): HTMLElement {
     titleKey?: StringKey,
   ): HTMLElement =>
     toggleSwitch(
+      "chk",
       t(textKey),
       settings[key],
       (checked) => apply({ [key]: checked }),
@@ -182,10 +183,10 @@ export function buildSettingsPanel(ctx: SettingsPanelContext): HTMLElement {
   ignoredRow.appendChild(resetIgnoredBtn);
 
   body.append(
-    buildSubsection("🛣️", t("roadTypesLabel"), [grid]),
-    buildSubsection("🏷️", t("statusesLabel"), [statusGrid]),
-    buildSubsection("🎛️", t("optionsLabel"), options),
-    buildSubsection("📍", t("scopeDisplayLabel"), [scopingRow, zoomRow, langRow, ignoredRow]),
+    buildSubsection("chk", "road", t("roadTypesLabel"), [grid]),
+    buildSubsection("chk", "filter", t("statusesLabel"), [statusGrid]),
+    buildSubsection("chk", "list", t("optionsLabel"), options),
+    buildSubsection("chk", "location", t("scopeDisplayLabel"), [scopingRow, zoomRow, langRow, ignoredRow]),
   );
   details.appendChild(body);
   return details;
