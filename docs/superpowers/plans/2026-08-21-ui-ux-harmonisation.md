@@ -27,9 +27,28 @@
 ```bash
 npx tsc --noEmit
 npx vitest run src/ui src/street-name-checker src/house-number-importer
-npx eslint src
+npx eslint src/ui src/street-name-checker src/house-number-importer
 npx rollup -c
 ```
+
+**Baseline, measured on `refactor/ui-ux-improvements` at `95f1945` before any code changed:**
+
+| Check | Result |
+| --- | --- |
+| `npx tsc --noEmit` | clean |
+| `npx vitest run` (whole suite) | 38 files, **547 passed, 1 skipped** |
+| `npx eslint src/ui src/street-name-checker src/house-number-importer` | clean |
+| `npx rollup -c` | builds |
+
+Two pre-existing conditions, **neither of them yours to fix**:
+
+- `npx eslint src` reports one error, `src/tileLayer.ts:68 'args' is defined but never
+  used`. That file belongs to the public-transport layers, outside this plan's scope, which
+  is why the loop above lints the touched paths rather than all of `src`. Do not touch it.
+- `npx rollup -c` prints circular-dependency warnings from `node_modules/d3-voronoi`. They
+  come from a dependency and the build succeeds.
+
+The test count only ever goes up. If it drops, a test was lost — stop and report.
 
 ---
 
@@ -431,7 +450,7 @@ Expected: PASS, 10 tests.
 - [ ] **Step 6: Run the full verification loop**
 
 ```bash
-npx tsc --noEmit && npx vitest run src/ui src/street-name-checker src/house-number-importer && npx eslint src && npx rollup -c
+npx tsc --noEmit && npx vitest run src/ui src/street-name-checker src/house-number-importer && npx eslint src/ui src/street-name-checker src/house-number-importer && npx rollup -c
 ```
 
 - [ ] **Step 7: Commit**
@@ -565,7 +584,7 @@ Expected: PASS, including the two new `dot` tests.
 - [ ] **Step 7: Run the full verification loop**
 
 ```bash
-npx tsc --noEmit && npx vitest run src/ui src/street-name-checker src/house-number-importer && npx eslint src && npx rollup -c
+npx tsc --noEmit && npx vitest run src/ui src/street-name-checker src/house-number-importer && npx eslint src/ui src/street-name-checker src/house-number-importer && npx rollup -c
 ```
 
 - [ ] **Step 8: Commit**
@@ -626,7 +645,7 @@ test ! -e src/street-name-checker/ui/dom.ts && test ! -e src/house-number-import
 - [ ] **Step 6: Run the full verification loop**
 
 ```bash
-npx tsc --noEmit && npx vitest run src/ui src/street-name-checker src/house-number-importer && npx eslint src && npx rollup -c
+npx tsc --noEmit && npx vitest run src/ui src/street-name-checker src/house-number-importer && npx eslint src/ui src/street-name-checker src/house-number-importer && npx rollup -c
 ```
 
 - [ ] **Step 7: Commit**
@@ -785,7 +804,7 @@ Expected: well under the 218 lines it started at (the generic half is gone).
 - [ ] **Step 8: Run the full verification loop**
 
 ```bash
-npx tsc --noEmit && npx vitest run src/ui src/street-name-checker src/house-number-importer && npx eslint src && npx rollup -c
+npx tsc --noEmit && npx vitest run src/ui src/street-name-checker src/house-number-importer && npx eslint src/ui src/street-name-checker src/house-number-importer && npx rollup -c
 ```
 
 - [ ] **Step 9: Manual smoke test in WME**
@@ -882,7 +901,7 @@ Expected: PASS.
 - [ ] **Step 6: Run the full verification loop**
 
 ```bash
-npx tsc --noEmit && npx vitest run src/ui src/street-name-checker src/house-number-importer && npx eslint src && npx rollup -c
+npx tsc --noEmit && npx vitest run src/ui src/street-name-checker src/house-number-importer && npx eslint src/ui src/street-name-checker src/house-number-importer && npx rollup -c
 ```
 
 - [ ] **Step 7: Commit**
@@ -1030,7 +1049,7 @@ Expected: PASS.
 - [ ] **Step 7: Run the full verification loop**
 
 ```bash
-npx tsc --noEmit && npx vitest run src/ui src/street-name-checker src/house-number-importer && npx eslint src && npx rollup -c
+npx tsc --noEmit && npx vitest run src/ui src/street-name-checker src/house-number-importer && npx eslint src/ui src/street-name-checker src/house-number-importer && npx rollup -c
 ```
 
 - [ ] **Step 8: Manual smoke test in WME**
@@ -1213,7 +1232,7 @@ Expected: no key removed. If `makemessages` prunes something, stop and report ra
 - [ ] **Step 8: Run the full verification loop**
 
 ```bash
-npx tsc --noEmit && npx vitest run src/ui src/street-name-checker src/house-number-importer && npx eslint src && npx rollup -c
+npx tsc --noEmit && npx vitest run src/ui src/street-name-checker src/house-number-importer && npx eslint src/ui src/street-name-checker src/house-number-importer && npx rollup -c
 ```
 
 - [ ] **Step 9: Commit**
@@ -1331,7 +1350,7 @@ Expected: PASS.
 - [ ] **Step 8: Run the full verification loop**
 
 ```bash
-npx tsc --noEmit && npx vitest run src/ui src/street-name-checker src/house-number-importer && npx eslint src && npx rollup -c
+npx tsc --noEmit && npx vitest run src/ui src/street-name-checker src/house-number-importer && npx eslint src/ui src/street-name-checker src/house-number-importer && npx rollup -c
 ```
 
 - [ ] **Step 9: Manual smoke test in WME**
@@ -1439,7 +1458,7 @@ Expected: PASS.
 - [ ] **Step 5: Run the full verification loop**
 
 ```bash
-npx tsc --noEmit && npx vitest run src/ui src/street-name-checker src/house-number-importer && npx eslint src && npx rollup -c
+npx tsc --noEmit && npx vitest run src/ui src/street-name-checker src/house-number-importer && npx eslint src/ui src/street-name-checker src/house-number-importer && npx rollup -c
 ```
 
 - [ ] **Step 6: Manual smoke test in WME**
@@ -1747,7 +1766,7 @@ Adjust the surrounding prose in the checker and house-number sections that refer
 - [ ] **Step 9: Run the full verification loop**
 
 ```bash
-npx tsc --noEmit && npx vitest run src/ui src/street-name-checker src/house-number-importer && npx eslint src && npx rollup -c
+npx tsc --noEmit && npx vitest run src/ui src/street-name-checker src/house-number-importer && npx eslint src/ui src/street-name-checker src/house-number-importer && npx rollup -c
 ```
 
 - [ ] **Step 10: Manual smoke test in WME**
@@ -1800,7 +1819,7 @@ Only `README.md` is edited; the three other language READMEs are generated by `t
 ```bash
 npx tsc --noEmit
 npx vitest run
-npx eslint src
+npx eslint src/ui src/street-name-checker src/house-number-importer
 npm run build
 ```
 
