@@ -1,4 +1,4 @@
-import { componentRules } from "../../ui/components";
+import { componentRules, EDIT_PANEL_HOST_CSS } from "../../ui/components";
 import { injectStyleOnce } from "../../ui/inject";
 import { tokenRules } from "../../ui/tokens";
 import { STATUS_STYLES } from "../map-layer";
@@ -27,8 +27,9 @@ export function statusDotRules(): string {
  * the floating window, the canton badge, the external links, the edit-panel helper box.
  */
 const CSS = `
-${tokenRules("chk", [".chk-pane", ".chk-helper", ".chk-window"])}
+${tokenRules("chk", [".chk-pane", ".chk-helper", ".chk-window", ".wmech-edit-host"])}
 ${componentRules("chk")}
+${EDIT_PANEL_HOST_CSS}
 ${statusDotRules()}
 
 .chk-toolbar { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }

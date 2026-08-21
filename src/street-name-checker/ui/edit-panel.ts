@@ -9,7 +9,6 @@ import {
   runFix,
   runFixGroup,
 } from "../fix";
-import { log } from "../log";
 import { STATUS_STYLES } from "../map-layer";
 import type { Issue } from "../matching/evaluate";
 import type { Scanner } from "../scan";
@@ -19,10 +18,17 @@ import { cantonMapLink } from "./canton-link";
 import { mapGeoAdminUrlForGeometry } from "../geoadmin/links";
 import { getLocale, t } from "../i18n";
 import { icon } from "../../ui/dom";
+import {
+  refreshEditPanelHost,
+  registerEditPanelSlot,
+  setEditPanelHostTitle,
+} from "../../ui/edit-panel-host";
 
-const CONTAINER_ID = "chk-edit-helper";
-/** The WME edit panel renders asynchronously after a selection; retry injection. */
-const INJECT_RETRY_DELAYS_MS = [0, 250, 750];
+/**
+ * Display rank inside the shared host. The street name comes first: a segment whose name
+ * is wrong makes its house numbers moot.
+ */
+const SLOT_RANK = 10;
 
 /** All issues sharing the reference issue's group (same status, name and suggestion). */
 export function issuesInSameGroup(issues: ReadonlyMap<number, Issue>, ref: Issue): Issue[] {
@@ -37,8 +43,6 @@ export function issuesInSameGroup(issues: ReadonlyMap<number, Issue>, ref: Issue
  * No search UI by design (removed in 0.4.1 after field feedback).
  */
 export class EditPanelBox {
-  private retryTimers: ReturnType<typeof setTimeout>[] = [];
-  private warnedMissingPanel = false;
 
   constructor(
     private sdk: WmeSDK,
@@ -47,6 +51,9 @@ export class EditPanelBox {
   ) {}
 
   init(): void {
+    // The host holds no i18next instance of its own; the first feature to register names it.
+    setEditPanelHostTitle(t("editPanelHostTitle"));
+    registerEditPanelSlot({ id: "street-name", rank: SLOT_RANK, render: () => this.render() });
     this.sdk.Events.on({ eventName: "wme-selection-changed", eventHandler: () => this.schedule() });
     this.sdk.Events.on({ eventName: "wme-after-edit", eventHandler: () => this.schedule() });
     this.scanner.onUpdate(() => this.schedule());
@@ -68,48 +75,18 @@ export class EditPanelBox {
     // wme-after-edit fires per fixed segment; don't rebuild the box (and its
     // progress button) while a fix batch is running.
     if (isFixInFlight()) return;
-    for (const timer of this.retryTimers) clearTimeout(timer);
-    this.retryTimers = [];
+    refreshEditPanelHost();
+  }
+
+  /** Returns null when there is nothing to say; the host then drops the slot entirely. */
+  private render(): HTMLElement | null {
+    const settings = this.settings.get();
     const segmentId = this.selectedSegmentId();
-    const s = this.settings.get();
-    if (!s.editPanelHelper || !s.enabled || this.scanner.paused || segmentId === null) {
-      document.getElementById(CONTAINER_ID)?.remove();
-      return;
-    }
-    for (const delay of INJECT_RETRY_DELAYS_MS) {
-      this.retryTimers.push(setTimeout(() => this.inject(segmentId), delay));
-    }
-  }
+    if (!settings.editPanelHelper || !settings.enabled || this.scanner.paused) return null;
+    if (segmentId === null) return null;
 
-  private inject(segmentId: number): void {
-    if (this.selectedSegmentId() !== segmentId) return;
-    // DELIBERATE deviation from CLAUDE.md "no direct DOM hacks that bypass SDK events".
-    // The WME SDK exposes no extension point for the segment edit panel (only the
-    // sidebar script tab via registerScriptTab, and the request/street-view panels) —
-    // verified against wme-sdk-typings. So this companion box is injected by hand.
-    // Containment: selection/edit are still driven by SDK events; only the mount uses
-    // the DOM, behind a documented selector. If WME renames #edit-panel the box simply
-    // does not appear (warned once below) — it never corrupts data or the host UI.
-    const panel = document.querySelector("#edit-panel");
-    if (!panel) {
-      if (!this.warnedMissingPanel) {
-        this.warnedMissingPanel = true;
-        log.warn("#edit-panel not found; the edit-panel box is unavailable in this WME version");
-      }
-      return;
-    }
-    let container = document.getElementById(CONTAINER_ID);
-    if (!container) {
-      container = document.createElement("div");
-      container.id = CONTAINER_ID;
-      container.className = "chk-helper";
-      panel.prepend(container);
-    }
-    this.render(container, segmentId);
-  }
-
-  private render(container: HTMLElement, segmentId: number): void {
-    container.replaceChildren();
+    const container = document.createElement("div");
+    container.className = "chk-helper";
     const snapshot = this.scanner.getSnapshot();
     const issue = snapshot.issues.get(segmentId);
 
@@ -132,9 +109,10 @@ export class EditPanelBox {
         dot.style.background = "var(--chk-ok)";
         statusText.textContent = t("helperOk");
       } else {
-        container.remove(); // nothing meaningful to say (skipped type, uncovered area)
+        // Nothing meaningful to say (skipped type, uncovered area): stay out of the host.
+        return null;
       }
-      return;
+      return container;
     }
 
     dot.style.background = STATUS_STYLES[issue.status].strokeColor;
@@ -212,6 +190,7 @@ export class EditPanelBox {
       buttons.appendChild(ignoreAllBtn);
     }
     container.appendChild(buttons);
+    return container;
   }
 
   private onIgnore(issue: Issue): void {

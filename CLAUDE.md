@@ -79,7 +79,7 @@ first-day editor installed it:
 | --- | --- |
 | Own SDK instance and `scriptId` (`index.ts`) | `registerScriptTab()` throws if the host's scriptId already owns a tab |
 | Own i18next instance (`i18n.ts`) | The checker's language is a per-feature preference; sharing the host singleton would flip the whole UI. Strings still live in `locales/<lang>/common.json`, under `streetCheck` |
-| DOM injection into the segment edit panel (`ui/edit-panel.ts`, in the checker and in the house-number importer) | The SDK exposes no extension point there. Two features now mount a box in `#edit-panel`, each under its own container id; the containment rule is unchanged, the DOM is only a mount point |
+| DOM injection into the segment edit panel (`src/ui/edit-panel-host.ts`) | The SDK exposes no extension point there. **One** container is mounted, and each feature registers a slot with a declared rank; previously each feature prepended its own box on its own retry schedule, so their order depended on which retry won and could flip between selections. A slot that has nothing to say returns `null` and leaves no trace; the host removes itself when every slot does. The containment rule is unchanged, the DOM is only a mount point |
 | Floating window injected into `document.body` (`ui/floating-window.ts`, `ui/window-mode.ts`) | WME switches the sidebar to its Selection panel the moment a segment is clicked, hiding the tab exactly when it is being used. The SDK offers no way to keep a script tab visible, and no window or panel API. The window only hosts DOM the tab already builds; scanning, selection and editing still go through SDK events |
 | Reordering our own tabs in the Scripts bar (`src/ui/tab-group.ts`) | The SDK's `Sidebar` module exposes only `registerScriptTab()` and `removeScriptTab()`, neither taking arguments: no ordering, grouping, icon or colour. Label and pane are moved together so a pairing by position survives; every failure is silent, and the tabs then simply keep their native place, still prefixed `CH ·` |
 | Canton flags as base64 data URIs (`ui/canton-flags.ts`) | Rollup has no SVG asset loader in this setup |
@@ -98,7 +98,8 @@ on the selected segment. Keep the credit in `index.ts` and in the four READMEs.
 
 Pipeline: `GwrTileFetcher` (gwr/) → `computeStatuses` (status.ts, using `matching.ts` and
 the numbers read by `existing.ts`) → `AddressPointLayer` on the map, `TabUI` in the sidebar
-and `EditPanelBox` in the segment panel. `import.ts` is the only module that writes.
+and `EditPanelBox` as a slot in the shared segment-panel host. `import.ts` is the only
+module that writes.
 
 - `gwr/tiles.ts`: tiles are `0.005°`, four times finer than the checker's. Measured in
   central Zurich, a `0.02°` tile holds 4549 addresses (23 pages, past the cap) against 166
@@ -136,7 +137,7 @@ excluded by default and runs with `WME_CH_INTEGRATION=1`.
 - Do not guess or invent SDK APIs — if information is missing from typings or docs, flag it.
 - Do not use deprecated WME globals (documented in migration guide's "Pre-SDK usage" section).
 - No direct DOM hacks that bypass SDK events. Two sanctioned exceptions, both listed in
-  the deviations table above and both in `src/street-name-checker/ui/`: the edit-panel box
+  the deviations table above: the shared edit-panel host (`src/ui/edit-panel-host.ts`)
   and the floating window, where the SDK offers no extension point at all. Adding a third
   means documenting it there with its reason, and keeping the same containment: the DOM is
   only a mount point, everything else still goes through SDK events.

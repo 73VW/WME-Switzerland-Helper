@@ -19,6 +19,20 @@
  *   12px/400  body (the pane's own size, inherited by everything unless stated)
  *   11px/400  secondary: pills, notes, buttons; 600 for a counter inside a pill
  */
+/**
+ * The shared segment edit-panel host. Unprefixed, because there is exactly one of it in the
+ * page, shared by every feature. It reads the checker's tokens, which are declared on
+ * `.wmech-edit-host` by that feature's tokenRules scope list.
+ */
+export const EDIT_PANEL_HOST_CSS = `
+.wmech-edit-host { margin: 8px; border: 1px solid var(--chk-border); border-radius: var(--chk-radius); background: var(--chk-surface); color: var(--chk-text); overflow: hidden; font-size: 12px; }
+.wmech-edit-host-head { display: flex; align-items: center; gap: 6px; padding: 6px 10px; font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--chk-muted); border-bottom: 1px solid var(--chk-border); }
+.wmech-slot { padding: 8px 10px; display: flex; flex-direction: column; gap: 5px; }
+.wmech-slot + .wmech-slot { border-top: 1px solid var(--chk-border); }
+/* The slots bring their own pane class for typography; the host owns the spacing. */
+.wmech-slot > .chk-helper, .wmech-slot > .hn-pane { margin: 0; padding: 0; border: none; background: none; }
+`;
+
 export function componentRules(p: string): string {
   return `
 .${p}-pane { font-family: var(--${p}-font); font-size: 12px; padding: 8px; display: flex; flex-direction: column; gap: 10px; color: var(--${p}-text); }
