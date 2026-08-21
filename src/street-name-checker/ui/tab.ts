@@ -68,7 +68,6 @@ export class TabUI {
   /** Debounce timer for viewport re-filtering on pan; null when idle. */
   private panTimer: ReturnType<typeof setTimeout> | null = null;
   /** Checkboxes of the duplicated viewport-only toggle (master row + Settings). */
-  private viewportInputs: HTMLInputElement[] = [];
   /** Checkbox of the master enabled toggle, realigned when the layer checkbox is used. */
   private enabledInput: HTMLInputElement | null = null;
   /** Last theme re-measure timestamp (belt-and-braces next to the observer). */
@@ -186,7 +185,6 @@ export class TabUI {
   private buildSkeleton(): void {
     this.pane.classList.add("chk-pane");
     this.optionsPane.classList.add("chk-pane");
-    this.viewportInputs = []; // rebuild() re-creates both toggle instances
 
     const brand = el("div", "chk-brand");
     brand.append(
@@ -202,7 +200,16 @@ export class TabUI {
     nextBtn.title = t("nextIssueTitle");
     nextBtn.addEventListener("click", () => this.selectNextIssue());
     this.unsavedBadge = el("span", "chk-unsaved", "");
-    toolbar.append(rescanBtn, nextBtn, this.unsavedBadge);
+    toolbar.append(rescanBtn, nextBtn);
+    // Detach is an action, not a setting, so it belongs beside the other two. Only offered
+    // while docked: once floating, the window's own bar carries the way back.
+    if (this.settings.get().windowMode === "sidebar") {
+      const detachBtn = el("button", "chk-btn", t("detach"));
+      detachBtn.title = t("detachTitle");
+      detachBtn.addEventListener("click", () => this.onDetach());
+      toolbar.appendChild(detachBtn);
+    }
+    toolbar.appendChild(this.unsavedBadge);
 
     // The banner holds a text span plus an action button (Scan this area /
     // Cancel), so render() must only touch the span, not the whole banner.
@@ -215,6 +222,8 @@ export class TabUI {
       else void this.scanner.scanArea();
     });
     this.statusLine.append(this.statusText, this.bannerBtn);
+    // Not a face of the status line: a data-quality caveat shows *alongside* "done", not
+    // instead of it. Hidden while empty, so it costs no height in the common case.
     this.warnLine = el("div", "chk-warn");
     this.warnLine.hidden = true;
     this.chipsBox = el("div", "chk-pills");
@@ -224,42 +233,42 @@ export class TabUI {
     busy.append(el("span", "chk-spinner"), el("span", "chk-busy-text", t("updating")));
     this.listBox.append(this.chipsBox, this.groupsBox, busy);
 
-    const masterToggles = this.buildMasterToggles();
-    const legend = this.buildLegend();
+    // The master switch joins the title line rather than owning a block below it.
+    const enabledToggle = toggleSwitch(
+      "chk",
+      t("toggleEnabled"),
+      this.settings.get().enabled,
+      (checked) => this.onEnabledChange(checked),
+      t("toggleEnabledTitle"),
+    );
+    enabledToggle.classList.add("chk-brand-switch");
+    this.enabledInput = enabledToggle.querySelector("input");
+    brand.appendChild(enabledToggle);
+
     const settingsPanel = buildSettingsPanel({
       sdk: this.sdk,
       settings: this.settings,
       scanner: this.scanner,
       rebuild: () => this.rebuild(),
       viewportOnlyToggle: () => this.viewportOnlyToggle(),
+      autoScanToggle: () => this.autoScanToggle(),
+      footer: () => this.buildFooter(),
     });
-    const footer = this.buildFooter();
 
     if (this.pane === this.optionsPane) {
-      // Docked: one column, and the historical order is kept exactly, toggles above
-      // the list rather than pushed below it by the split.
-      this.pane.append(
-        brand,
-        toolbar,
-        this.statusLine,
-        this.warnLine,
-        masterToggles,
-        this.listBox,
-        legend,
-        settingsPanel,
-        footer,
-      );
+      // Docked: one column. Legend, settings and footer are one collapsible now, so the
+      // list starts higher and keeps the height they used to take.
+      this.pane.append(brand, toolbar, this.statusLine, this.warnLine, this.listBox, settingsPanel);
       return;
     }
 
     // Detached: the window carries the working surface, the sidebar keeps the options.
-    // Both are still built in this single pass, which is what keeps the two instances
-    // of the viewport-only switch in sync through viewportInputs.
     //
-    // No brand block here: the window's own title bar already carries the name, and
-    // repeating it right underneath wastes the height the list needs.
+    // No brand block in the window: its own title bar already carries the name, and
+    // repeating it right underneath wastes the height the list needs. The master switch
+    // rides with the brand, so the sidebar keeps it.
     this.pane.append(toolbar, this.statusLine, this.warnLine, this.listBox);
-    this.optionsPane.append(masterToggles, legend, settingsPanel, footer);
+    this.optionsPane.append(brand, settingsPanel);
   }
 
   /**
@@ -271,65 +280,39 @@ export class TabUI {
     if (this.enabledInput) this.enabledInput.checked = checked;
   }
 
-  private buildMasterToggles(): HTMLElement {
-    const row = el("div", "chk-master");
-    const settings = this.settings.get();
-    const enabledToggle = toggleSwitch(
+  /** Auto-scan: lives in Settings now, but it drives TabUI's scanner, so TabUI builds it. */
+  private autoScanToggle(): HTMLElement {
+    return toggleSwitch(
       "chk",
-      t("toggleEnabled"),
-      settings.enabled,
-      (checked) => this.onEnabledChange(checked),
-      t("toggleEnabledTitle"),
+      t("toggleAutoScan"),
+      this.settings.get().autoScan,
+      (checked) => {
+        this.settings.update({ autoScan: checked });
+        if (checked && this.settings.get().enabled) this.scanner.requestScan();
+      },
+      t("toggleAutoScanTitle"),
     );
-    this.enabledInput = enabledToggle.querySelector("input");
-    row.append(
-      enabledToggle,
-      toggleSwitch(
-        "chk",
-        t("toggleAutoScan"),
-        settings.autoScan,
-        (checked) => {
-          this.settings.update({ autoScan: checked });
-          if (checked && this.settings.get().enabled) this.scanner.requestScan();
-        },
-        t("toggleAutoScanTitle"),
-      ),
-      // surfaced here because it silently changes the list and every counter;
-      // the Settings entry remains, both stay in sync via viewportInputs
-      this.viewportOnlyToggle(),
-    );
-    // Only offered while docked: once floating, the window's own bar carries the
-    // controls and this row is not the place to duplicate them.
-    if (this.settings.get().windowMode === "sidebar") {
-      const detachBtn = el("button", "chk-btn", t("detach"));
-      detachBtn.title = t("detachTitle");
-      detachBtn.addEventListener("click", () => this.onDetach());
-      row.appendChild(detachBtn);
-    }
-    return row;
   }
 
   /**
-   * Viewport-only toggle, shown both in the master row and in Settings. The
-   * settings store has no observer, so every instance registers its checkbox
-   * and the shared handler mirrors the state across them.
+   * Viewport-only toggle. Built once, in Settings.
+   *
+   * It used to exist twice, in the master row and in Settings, kept in step by a
+   * viewportInputs mirror. Flattening the tab removed the master row, and with a single
+   * instance the mirror had nothing left to mirror.
    */
   private viewportOnlyToggle(): HTMLElement {
-    const label = toggleSwitch(
+    return toggleSwitch(
       "chk",
       t("viewportOnly"),
       this.settings.get().viewportOnly,
       (checked) => {
         this.settings.update({ viewportOnly: checked });
-        for (const input of this.viewportInputs) input.checked = checked;
         // display-only filter: refresh the rendered list, no rescan
         this.render(this.scanner.getSnapshot(), true);
       },
       t("viewportOnlyTitle"),
     );
-    const input = label.querySelector("input");
-    if (input) this.viewportInputs.push(input);
-    return label;
   }
 
   private buildFooter(): HTMLElement {
@@ -344,23 +327,6 @@ export class TabUI {
     link.rel = "noopener";
     footer.appendChild(link);
     return footer;
-  }
-
-  private buildLegend(): HTMLElement {
-    const details = el("details", "chk-section");
-    const summary = el("summary");
-    summary.append(icon("layers", "chk-section-icon"), el("span", "", t("legendTitle")));
-    details.appendChild(summary);
-    const body = el("div", "chk-section-body");
-    for (const status of Object.keys(STATUS_STYLES) as IssueStatus[]) {
-      const row = el("div", "chk-settings-row");
-      const dot = el("span", "chk-dot");
-      dot.style.background = STATUS_STYLES[status].strokeColor;
-      row.append(dot, el("span", "", `${status}: ${t(LEGEND_KEYS[status])}`));
-      body.appendChild(row);
-    }
-    details.appendChild(body);
-    return details;
   }
 
   private render(snapshot: ScanSnapshot, force = false): void {
@@ -584,9 +550,13 @@ export class TabUI {
 
     // Explicit lines instead of one flex-wrap soup: status/count/zoom on top,
     // the (possibly long) name on its own line, action buttons at the bottom.
+    // What the Legend block used to say, said here instead: beside the group it explains,
+    // so it is read at the moment it is useful rather than in a section nobody opened.
+    const explain = el("div", "chk-explain", t(LEGEND_KEYS[group.status]));
+
     const topLine = el("div", "chk-group-top");
     topLine.append(badge, count, zoomBtn);
-    header.append(topLine, names);
+    header.append(topLine, names, explain);
 
     // Below editor level 3 the group actions are not shown at all, rather than shown and
     // refused: a disabled button still invites the click. Per-segment Fix stays available.

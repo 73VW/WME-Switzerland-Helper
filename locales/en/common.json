@@ -122,6 +122,7 @@
     "helperOk": "matches the official register",
     "helperSetting": "Issue box in the segment edit panel",
     "settingsTitle": "Settings",
+    "settingsAndHelp": "Settings and help",
     "roadTypesLabel": "Checked road types:",
     "statusesLabel": "Checked issue types:",
     "optionsLabel": "Options",

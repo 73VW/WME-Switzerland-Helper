@@ -29,14 +29,18 @@ export interface SettingsPanelContext {
   scanner: Pick<Scanner, "requestScan" | "reevaluate">;
   /** Rebuilds the whole tab; the language selector needs it. */
   rebuild: () => void;
-  /** Owned by TabUI: the switch is duplicated in the master row and both must track. */
+  /** Owned by TabUI: it is the sole instance now, the master row no longer duplicates it. */
   viewportOnlyToggle: () => HTMLElement;
+  /** Owned by TabUI: it drives a scan, which is TabUI's scanner, not the store. */
+  autoScanToggle: () => HTMLElement;
+  /** The changelog link, which used to be a top-level block of its own. */
+  footer: () => HTMLElement;
 }
 
 export function buildSettingsPanel(ctx: SettingsPanelContext): HTMLElement {
   const details = el("details", "chk-section");
   const summary = el("summary");
-  summary.append(icon("settings", "chk-section-icon"), el("span", "", t("settingsTitle")));
+  summary.append(icon("settings", "chk-section-icon"), el("span", "", t("settingsAndHelp")));
   details.appendChild(summary);
   const body = el("div", "chk-section-body");
   const settings = ctx.settings.get();
@@ -182,11 +186,15 @@ export function buildSettingsPanel(ctx: SettingsPanelContext): HTMLElement {
   });
   ignoredRow.appendChild(resetIgnoredBtn);
 
+  // Auto-scan sits at the top, outside any subsection: it is the one setting an editor
+  // reaches for often, and it used to be a click away in the master row.
   body.append(
+    ctx.autoScanToggle(),
     buildSubsection("chk", "road", t("roadTypesLabel"), [grid]),
     buildSubsection("chk", "filter", t("statusesLabel"), [statusGrid]),
     buildSubsection("chk", "list", t("optionsLabel"), options),
     buildSubsection("chk", "location", t("scopeDisplayLabel"), [scopingRow, zoomRow, langRow, ignoredRow]),
+    ctx.footer(),
   );
   details.appendChild(body);
   return details;

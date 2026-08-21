@@ -31,6 +31,8 @@ export function componentRules(p: string): string {
 .${p}-brand { display: flex; align-items: center; gap: 8px; }
 .${p}-brand-icon { font-size: 16px; line-height: 1; }
 .${p}-brand-title { font-weight: 700; font-size: 14px; color: var(--${p}-text); }
+/* The master switch rides on the title line rather than owning a block below it. */
+.${p}-brand-switch { margin-left: auto; }
 
 /* Buttons. Neutral is the default; primary carries the one positive action of the panel.
    Hover is a brightness filter rather than a second colour token to maintain. */

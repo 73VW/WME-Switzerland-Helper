@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { STATUS_STYLES } from "../map-layer";
 import type { IssueStatus } from "../matching/evaluate";
 import { LABEL_KEYS, LEGEND_KEYS, statusLabel } from "./format";
-import { setLocale, type LocaleCode } from "../i18n";
+import { setLocale, t, type LocaleCode } from "../i18n";
 
 const STATUSES = Object.keys(STATUS_STYLES) as IssueStatus[];
 /** Typed rather than string[], so a locale that stops being supported fails to compile. */
@@ -45,6 +45,45 @@ describe("statusLabel", () => {
     for (const status of STATUSES) {
       expect(LABEL_KEYS[status]).not.toBe(LEGEND_KEYS[status]);
       expect(statusLabel(status).length, status).toBeLessThan(200);
+    }
+    setLocale("en");
+  });
+});
+
+/**
+ * Flattening the tab moved controls between blocks. The point of these is that nothing was
+ * dropped on the way, and that the two features keep the same skeleton.
+ *
+ * They read the i18n bundle rather than the sources: no @types/node here, and a key that
+ * disappears is the failure that actually matters.
+ */
+describe("flattened tab inventory", () => {
+  it.each(LOCALES)("keeps every control's label in %s", (locale) => {
+    setLocale(locale);
+    for (const key of [
+      "toggleEnabled",
+      "toggleAutoScan",
+      "viewportOnly",
+      "detach",
+      "rescan",
+      "nextIssue",
+      "settingsAndHelp",
+    ] as const) {
+      const text = t(key);
+      expect(text, `${key} in ${locale}`).not.toBe(key);
+      expect(text, `${key} in ${locale}`).not.toBe("");
+    }
+    setLocale("en");
+  });
+
+  it.each(LOCALES)("still explains every status, now inside its group, in %s", (locale) => {
+    setLocale(locale);
+    for (const status of STATUSES) {
+      const explanation = t(LEGEND_KEYS[status]);
+      expect(explanation, `${status} in ${locale}`).not.toBe(LEGEND_KEYS[status]);
+      // The long form is what the group now shows; a short one would mean the legend was
+      // lost rather than moved.
+      expect(explanation.length, `${status} in ${locale}`).toBeGreaterThan(10);
     }
     setLocale("en");
   });

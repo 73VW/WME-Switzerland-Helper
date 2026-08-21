@@ -106,6 +106,9 @@ ${statusDotRules()}
    label an editor actually reads, so it takes the secondary size like the rest. */
 .chk-status-label { font-size: 11px; font-weight: 600; color: var(--chk-text); }
 .chk-group-names { overflow-wrap: break-word; }
+/* The former Legend entry, now attached to the group it explains. Secondary size and
+   muted, so it informs without competing with the street names above it. */
+.chk-explain { font-size: 11px; color: var(--chk-muted); line-height: 1.35; }
 /* The geometric verdict keeps a visible marker in the group name; warn colour, not the
    text colour, so it reads as a caution rather than as part of the street name. */
 .chk-status-warn { color: var(--chk-warn); margin-right: 4px; }

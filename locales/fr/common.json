@@ -122,6 +122,7 @@
     "helperOk": "correspond au répertoire officiel",
     "helperSetting": "Encadré d'écart dans le panneau d'édition du segment",
     "settingsTitle": "Réglages",
+    "settingsAndHelp": "Réglages et aide",
     "roadTypesLabel": "Types de routes vérifiés:",
     "statusesLabel": "Types d'erreurs vérifiés:",
     "optionsLabel": "Options",
