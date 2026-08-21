@@ -26,6 +26,7 @@ import {
   geometryIntersectsBbox,
   groupIssues,
   LEGEND_KEYS,
+  statusLabel,
   STATE_KEYS,
   type IssueGroup,
 } from "./format";
@@ -506,7 +507,11 @@ export class TabUI {
       chip.setAttribute("aria-pressed", String(this.activeFilters.has(status)));
       const dot = el("span", "chk-dot");
       dot.style.background = STATUS_STYLES[status].strokeColor;
-      chip.append(dot, `${status} ${count}`);
+      chip.append(
+        dot,
+        el("span", "", statusLabel(status)),
+        el("span", "chk-pill-value", String(count)),
+      );
       chip.title = t("filterChipTitle");
       chip.addEventListener("click", () => {
         if (this.activeFilters.has(status)) this.activeFilters.delete(status);
@@ -544,7 +549,10 @@ export class TabUI {
     // dot + visible status code (same pattern as the chips), so the status is
     // not conveyed by color alone
     const badge = el("span", "chk-status");
-    badge.append(el("span", `chk-dot chk-dot-${group.status}`), el("span", "chk-status-code", group.status));
+    badge.append(
+      el("span", `chk-dot chk-dot-${group.status}`),
+      el("span", "chk-status-label", statusLabel(group.status)),
+    );
 
     const noteText = formatNote(group.note);
     // a real button (styled as plain text) so expand/collapse works with the

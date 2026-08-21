@@ -14,7 +14,7 @@ import { STATUS_STYLES } from "../map-layer";
 import type { Issue } from "../matching/evaluate";
 import type { Scanner } from "../scan";
 import type { SettingsStore } from "../settings";
-import { formatNote, LEGEND_KEYS, STATE_KEYS } from "./format";
+import { formatNote, LEGEND_KEYS, STATE_KEYS, statusLabel } from "./format";
 import { cantonMapLink } from "./canton-link";
 import { mapGeoAdminUrlForGeometry } from "../geoadmin/links";
 import { getLocale, t } from "../i18n";
@@ -138,8 +138,7 @@ export class EditPanelBox {
     }
 
     dot.style.background = STATUS_STYLES[issue.status].strokeColor;
-    // The dot beside it already carries the status; Task 7 replaces the enum with a label.
-    statusText.textContent = issue.status;
+    statusText.textContent = statusLabel(issue.status);
     const geoLink = document.createElement("a");
     geoLink.textContent = "↗";
     geoLink.className = "chk-geolink";

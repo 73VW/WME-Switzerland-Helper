@@ -102,7 +102,9 @@ ${statusDotRules()}
 .chk-group-actions { display: flex; justify-content: flex-end; gap: 6px; }
 /* dot + status label, mirroring the pills, so status is not color-only */
 .chk-status { display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; }
-.chk-status-code { font-size: 10px; font-weight: 600; color: var(--chk-muted); }
+/* Was 10px muted while it held an enum name and read as a technical code. It now holds the
+   label an editor actually reads, so it takes the secondary size like the rest. */
+.chk-status-label { font-size: 11px; font-weight: 600; color: var(--chk-text); }
 .chk-group-names { overflow-wrap: break-word; }
 /* The geometric verdict keeps a visible marker in the group name; warn colour, not the
    text colour, so it reads as a caution rather than as part of the street name. */
