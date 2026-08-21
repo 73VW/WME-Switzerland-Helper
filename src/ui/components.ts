@@ -43,11 +43,13 @@ export function componentRules(p: string): string {
 .${p}-muted { color: var(--${p}-muted); }
 .${p}-note { font-size: 11px; color: var(--${p}-muted); line-height: 1.4; }
 
-/* wrap, so a long title in German pushes the switch onto its own line instead of
-   squeezing it: the sidebar is narrow and the script tab bar makes it narrower. */
-.${p}-brand { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.${p}-brand-icon { font-size: 16px; line-height: 1; }
-.${p}-brand-title { font-weight: 700; font-size: 14px; color: var(--${p}-text); min-width: 0; }
+.${p}-brand { display: flex; align-items: center; gap: 8px; }
+.${p}-brand-icon { font-size: 16px; line-height: 1; flex-shrink: 0; }
+/* The title is the only thing on this line allowed to give way, and it ellipsizes rather
+   than wrapping: a wrapped brand row pushes the switch onto a line of its own, flush
+   right, which reads as a stray control. Both labels are short enough that this never
+   triggers in the four languages; it is the safety net, not the plan. */
+.${p}-brand-title { font-weight: 700; font-size: 14px; color: var(--${p}-text); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* The master switch rides on the title line rather than owning a block below it. It never
    shrinks and its label never breaks: it was the flex item giving way, so "Activé"
    rendered as "Act". The title yields first now, and the row wraps before either is

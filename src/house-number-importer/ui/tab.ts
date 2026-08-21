@@ -107,8 +107,14 @@ export class TabUI {
     brand.append(icon("home", "hn-brand-icon"), el("span", "hn-brand-title", t("appName")));
 
     // The master switch rides on the title line, as in the street-name tab.
-    const enabledToggle = toggleSwitch("hn", t("enable"), settings.enabled, (checked) =>
-      this.onEnabledChange(checked),
+    // Short label, like the street-name tab: the panel title beside it already says what
+    // is being enabled. The full sentence stays as the tooltip.
+    const enabledToggle = toggleSwitch(
+      "hn",
+      t("enable"),
+      settings.enabled,
+      (checked) => this.onEnabledChange(checked),
+      t("enableTitle"),
     );
     enabledToggle.classList.add("hn-brand-switch");
     this.enabledInput = enabledToggle.querySelector("input");

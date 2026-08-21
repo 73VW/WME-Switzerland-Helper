@@ -45,8 +45,10 @@ describe("componentRules", () => {
     const css = componentRules("chk");
     expect(css).toContain(".chk-brand-switch { margin-left: auto; flex-shrink: 0; }");
     expect(css).toContain(".chk-brand-switch .chk-switch-label { white-space: nowrap; }");
-    // The row wraps rather than clipping, for the longer German titles.
-    expect(css).toMatch(/\.chk-brand \{[^}]*flex-wrap: wrap/);
+    // The title is the one item allowed to give way, and it ellipsizes rather than wraps:
+    // a wrapped row leaves the switch alone on the next line, flush right.
+    expect(css).toMatch(/\.chk-brand-title \{[^}]*text-overflow: ellipsis/);
+    expect(css).not.toMatch(/\.chk-brand \{[^}]*flex-wrap/);
   });
 
   /** Two panels in one document must not share one animation or one class. */

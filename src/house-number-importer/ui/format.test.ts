@@ -125,6 +125,7 @@ describe("flattened tab inventory", () => {
     setLocale(locale);
     for (const key of [
       "enable",
+      "enableTitle",
       "settingsMinZoom",
       "settingsShowLabels",
       "settingsStrictMatch",
