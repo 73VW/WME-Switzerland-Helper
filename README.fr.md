@@ -126,6 +126,16 @@ Tous les changements notables de ce projet sont documentés ici.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et ce projet adhère au [Versionnage Sémantique](https://semver.org/spec/v2.0.0.html).
 
+### [1.5.2] - 2026-08-30
+
+#### Modifié
+
+- **Le vérificateur de noms de rues et l'importateur de numéros de maison ont enfin l'air d'un seul outil.** Ils ont été écrits l'un après l'autre et leurs panneaux avaient fini par diverger : blocs différents, mots différents pour la même chose, espacements différents. Les deux reposent désormais sur un jeu de composants partagé, si bien qu'une modification faite une fois se voit dans les deux.
+- **Les deux onglets ont été aplatis, le travail est visible sans faire défiler.** L'onglet des noms de rues est passé de neuf blocs empilés à cinq : l'interrupteur a rejoint la ligne de titre, *Détacher* a rejoint les autres actions de la barre d'outils, et la légende, les réglages et le lien vers le changelog ont fusionné en une seule section *Réglages et aide*. L'onglet des numéros de maison a reçu le même traitement, bloc pour bloc. Aucun réglage n'a été supprimé ; plusieurs sont simplement un pli plus loin au lieu d'être toujours à l'écran.
+- **Les écarts sont nommés au lieu d'être codés.** Un filtre affichait `WRONG_STREET 3`, le nom que le code utilise en interne. Il affiche maintenant *Autre rue 3*, dans les quatre langues. L'explication qui vivait dans la légende se trouve désormais dans l'écart qu'elle explique, là où elle est lue au moment utile.
+- **Les panneaux utilisent les icônes et la police de l'éditeur Waze.** Les émojis étaient rendus par le système d'exploitation, donc dans une taille, une graisse et une allure différentes sur Windows, macOS et Linux, et sans aucune réaction au thème sombre. Les icônes suivent maintenant la couleur du texte et fonctionnent dans les deux thèmes.
+- **Les deux boîtes du panneau d'édition de segment ont fusionné en une seule, dans un ordre stable.** Elles étaient injectées indépendamment et pouvaient s'inverser d'une sélection à l'autre ; le nom de rue passe désormais toujours en premier, suivi des numéros de maison, dans une seule boîte.
+
 ### [1.5.1] - 2026-08-03
 
 #### Modifié

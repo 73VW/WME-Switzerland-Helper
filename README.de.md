@@ -126,6 +126,16 @@ Alle bemerkenswerten Änderungen an diesem Projekt sind hier dokumentiert.
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### [1.5.2] - 2026-08-30
+
+#### Geändert
+
+- **Der Strassennamen-Prüfer und der Hausnummern-Importeur wirken endlich wie ein einziges Werkzeug.** Sie entstanden nacheinander, und ihre Panels waren auseinandergedriftet: andere Bausteine, andere Wörter für dasselbe, andere Abstände. Beide stammen nun aus einem gemeinsamen Satz von Komponenten, so dass eine einmal gemachte Änderung in beiden sichtbar wird.
+- **Beide Reiter wurden verflacht, die Arbeit ist ohne Scrollen sichtbar.** Der Strassennamen-Reiter ging von neun gestapelten Blöcken auf fünf zurück: der Schalter wanderte in die Titelzeile, *Ablösen* zu den übrigen Aktionen in der Werkzeugleiste, und Legende, Einstellungen und Changelog-Link verschmolzen zu einem einzigen Abschnitt *Einstellungen und Hilfe*. Der Hausnummern-Reiter erhielt dieselbe Behandlung, Block für Block. Keine Einstellung wurde entfernt; mehrere liegen nur eine Faltung weiter statt ständig auf dem Bildschirm.
+- **Befunde werden benannt statt kodiert.** Ein Filter zeigte `WRONG_STREET 3`, den Namen, den der Code intern verwendet. Er zeigt jetzt *Andere Strasse 3*, in allen vier Sprachen. Die Erklärung, die früher in der Legende stand, sitzt nun in dem Befund, den sie erklärt, wo sie im nützlichen Moment gelesen wird.
+- **Die Panels verwenden die Symbole und die Schrift des Waze-Editors.** Emoji wurden vom Betriebssystem gezeichnet, also in anderer Grösse, Stärke und Anmutung auf Windows, macOS und Linux, und ohne jede Reaktion auf die dunkle Oberfläche. Die Symbole folgen jetzt der Textfarbe und funktionieren in beiden Oberflächen.
+- **Die zwei Kästen im Segment-Bearbeitungsfenster wurden zu einem, in stabiler Reihenfolge.** Sie wurden unabhängig voneinander eingefügt und konnten von einer Auswahl zur nächsten die Plätze tauschen; der Strassenname kommt nun immer zuerst, gefolgt von den Hausnummern, in einem einzigen Kasten.
+
 ### [1.5.1] - 2026-08-03
 
 #### Geändert

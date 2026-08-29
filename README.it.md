@@ -126,6 +126,16 @@ Tutti i cambiamenti notevoli di questo progetto sono documentati qui.
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e questo progetto aderisce al [Versionamento Semantico](https://semver.org/spec/v2.0.0.html).
 
+### [1.5.2] - 2026-08-30
+
+#### Modificato
+
+- **Il verificatore dei nomi delle vie e l'importatore di numeri civici sembrano finalmente un solo strumento.** Sono stati scritti uno dopo l'altro e i loro pannelli avevano finito per divergere: blocchi diversi, parole diverse per la stessa cosa, spaziature diverse. Entrambi provengono ora da un insieme condiviso di componenti, così una modifica fatta una volta si vede in tutti e due.
+- **Le due schede sono state appiattite, il lavoro è visibile senza scorrere.** La scheda dei nomi delle vie è passata da nove blocchi impilati a cinque: l'interruttore è salito sulla riga del titolo, *Stacca* ha raggiunto le altre azioni nella barra degli strumenti, e legenda, impostazioni e collegamento al changelog si sono fusi in un'unica sezione *Impostazioni e aiuto*. La scheda dei numeri civici ha ricevuto lo stesso trattamento, blocco per blocco. Nessuna impostazione è stata rimossa; diverse sono semplicemente una piega più in là invece di stare sempre a schermo.
+- **Le segnalazioni sono nominate invece che codificate.** Un filtro mostrava `WRONG_STREET 3`, il nome che il codice usa internamente. Ora mostra *Altra via 3*, nelle quattro lingue. La spiegazione che stava nella legenda si trova adesso dentro la segnalazione che spiega, dove viene letta nel momento utile.
+- **I pannelli usano le icone e il carattere dell'editor Waze.** Le emoji erano disegnate dal sistema operativo, quindi con dimensione, spessore e aspetto diversi su Windows, macOS e Linux, e senza alcuna reazione al tema scuro. Le icone seguono ora il colore del testo e funzionano in entrambi i temi.
+- **I due riquadri del pannello di modifica del segmento si sono fusi in uno solo, in un ordine stabile.** Venivano inseriti in modo indipendente e potevano scambiarsi di posto da una selezione all'altra; il nome della via viene ora sempre per primo, seguito dai numeri civici, in un unico riquadro.
+
 ### [1.5.1] - 2026-08-03
 
 #### Modificato

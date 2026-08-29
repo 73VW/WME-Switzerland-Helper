@@ -128,6 +128,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### [Unreleased]
 
+### [1.5.2] - 2026-08-30
+
 #### Changed
 
 - **The street-name checker and the house-number importer now look like one tool.** They were built one after the other and their panels had drifted apart: different building blocks, different names for the same thing, different spacing. Both now come from one shared set of components, so a change made once shows up in both.
