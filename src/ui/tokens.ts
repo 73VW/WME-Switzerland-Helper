@@ -18,6 +18,11 @@
 export const DARK_THEME_CLASS = "wmech-theme-dark";
 
 const LIGHT: Record<string, string> = {
+  // Inherited on purpose: WME declares `Rubik, Waze Boing, sans-serif` and loads Rubik
+  // itself, so the panels follow the editor for free, and follow it again if Waze ever
+  // changes typeface. WME's CSP would let us load a font of our own; choosing not to is
+  // what keeps our panels from reading as a foreign body inside the editor.
+  font: "inherit",
   bg: "var(--wz-color-background, #ffffff)",
   surface: "var(--wz-color-background-variant, #f4f6f8)",
   text: "var(--wz-color-on-background, #1b1d20)",

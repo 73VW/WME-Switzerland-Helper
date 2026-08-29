@@ -126,6 +126,16 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### [Unreleased]
+
+#### Changed
+
+- **The street-name checker and the house-number importer now look like one tool.** They were built one after the other and their panels had drifted apart: different building blocks, different names for the same thing, different spacing. Both now come from one shared set of components, so a change made once shows up in both.
+- **Both sidebar tabs were flattened, so the work is visible without scrolling.** The street-name tab went from nine stacked blocks to five: the on/off switch moved onto the title line, *Detach* joined the other actions in the toolbar, and the legend, the settings and the changelog link merged into a single *Settings and help* section. The house-number tab got the same treatment, block for block. No setting was removed; several are simply one fold away instead of always on screen.
+- **Findings are named instead of coded.** A filter used to read `WRONG_STREET 3`, which is the name the code uses internally. It now reads *Other street 3*, in all four languages. The explanation that used to live in the legend now sits inside the finding it explains, where it is read at the moment it is useful.
+- **The panels use the Waze editor's own icons and typeface.** Emoji were rendered by the operating system, which meant a different size, weight and look on Windows, macOS and Linux, and no reaction at all to the dark skin. The icons now follow the text colour, so they work in both skins.
+- **The two boxes in the segment edit panel merged into one, in a stable order.** They used to be injected independently and could swap places from one selection to the next; the street name now always comes first, followed by the house numbers, in a single box.
+
 ### [1.5.1] - 2026-08-03
 
 #### Changed

@@ -1,9 +1,9 @@
 import type { WmeSDK } from "wme-sdk-typings";
 import type { Controller, Snapshot } from "../controller";
 import { isImportInFlight } from "../import";
-import { log } from "../log";
 import type { SettingsStore } from "../settings";
-import { button, el } from "./dom";
+import { button, el } from "../../ui/dom";
+import { refreshEditPanelHost, registerEditPanelSlot } from "../../ui/edit-panel-host";
 import { getStreetNameVerdict } from "../../street-check-bridge";
 import {
   canBulkImport,
@@ -15,29 +15,24 @@ import {
 } from "./format";
 import { injectStyles } from "./styles";
 
-const CONTAINER_ID = "hn-import-helper";
-/** The street-name checker's own box in the same panel; see render(). */
-const CHECKER_BOX_ID = "chk-edit-helper";
-/** WME rebuilds the panel asynchronously after a selection; retry until it is there. */
-const INJECT_RETRY_DELAYS_MS = [0, 120, 400, 900];
+/**
+ * Display rank inside the shared host. The street name comes first: a segment whose name
+ * is wrong makes its numbers moot.
+ */
+const SLOT_RANK = 20;
 
 /**
- * A small box inside WME's segment edit panel.
+ * This feature's slot in the shared segment edit-panel host.
  *
  * This is where the bulk-import button has to live: the sidebar switches to WME's own
  * Selection panel the moment a segment is clicked, which is exactly when the editor wants
- * to import. Rather than opening a fourth DOM deviation with a floating window, this reuses
- * the one the CLAUDE.md already sanctions for the checker.
+ * to import.
  *
- * DELIBERATE deviation from "no direct DOM hacks that bypass SDK events": the SDK exposes
- * no extension point for the segment edit panel. Containment is the checker's: only the
- * mount touches the DOM, behind a documented selector; selection, data and edits still go
- * through SDK events. If WME renames #edit-panel the box simply does not appear, warned
- * once, and nothing else breaks.
+ * The DOM deviation and its containment now live in `src/ui/edit-panel-host.ts`, which is
+ * also the module that owns the mount, the retries and the missing-panel guard. This file
+ * only decides what to say and when to stay quiet.
  */
 export class EditPanelBox {
-  private retryTimers: Array<ReturnType<typeof setTimeout>> = [];
-  private warnedMissingPanel = false;
   private snapshot: Snapshot | null = null;
 
   constructor(
@@ -48,6 +43,11 @@ export class EditPanelBox {
 
   init(): void {
     injectStyles();
+    registerEditPanelSlot({
+      id: "house-numbers",
+      rank: SLOT_RANK,
+      render: (context) => this.render(context.siblings),
+    });
     this.controller.onUpdate((snapshot) => {
       this.snapshot = snapshot;
       this.schedule();
@@ -62,51 +62,23 @@ export class EditPanelBox {
   private schedule(): void {
     // Do not rebuild the box (and its button) while a batch is running underneath it.
     if (isImportInFlight()) return;
-    for (const timer of this.retryTimers) clearTimeout(timer);
-    this.retryTimers = [];
-
-    const snapshot = this.snapshot;
-    if (!this.settings.get().enabled || !snapshot || snapshot.segmentId === null) {
-      document.getElementById(CONTAINER_ID)?.remove();
-      return;
-    }
-    for (const delay of INJECT_RETRY_DELAYS_MS) {
-      this.retryTimers.push(setTimeout(() => this.inject(), delay));
-    }
+    refreshEditPanelHost();
   }
 
-  private inject(): void {
+  /** Returns null when there is nothing to say; the host then drops the slot entirely. */
+  private render(siblings: readonly string[]): HTMLElement | null {
     const snapshot = this.snapshot;
-    if (!snapshot || snapshot.segmentId === null) return;
+    if (!this.settings.get().enabled || !snapshot || snapshot.segmentId === null) return null;
 
-    const panel = document.querySelector("#edit-panel");
-    if (!panel) {
-      if (!this.warnedMissingPanel) {
-        this.warnedMissingPanel = true;
-        log.warn("#edit-panel not found; the edit-panel box is unavailable in this WME version");
-      }
-      return;
-    }
-
-    let container = document.getElementById(CONTAINER_ID);
-    if (!container) {
-      container = el("div", "hn-pane");
-      container.id = CONTAINER_ID;
-      panel.prepend(container);
-    }
-    this.render(container, snapshot);
-  }
-
-  private render(container: HTMLElement, snapshot: Snapshot): void {
+    // No street name here: WME's own field sits right below and already carries it.
     const children: HTMLElement[] = [
-      el("div", "hn-street", `🏠 ${snapshot.streetName || "?"}`),
       el("div", "hn-note", formatCounts(countByStatus(snapshot.points))),
     ];
 
-    // The checker's own box sits in this very panel and already reports the name verdict,
-    // with its fix buttons. Repeating it here would be noise, so we only speak up when it
-    // is absent.
-    if (!document.getElementById(CHECKER_BOX_ID) && snapshot.segmentId !== null) {
+    // The checker's slot sits in this very host and already reports the name verdict, with
+    // its fix buttons. Repeating it would be noise, so we only speak up when it stayed
+    // quiet. The host tells us, so we no longer go looking through another feature's DOM.
+    if (!siblings.includes("street-name")) {
       const verdict = formatVerdict(getStreetNameVerdict(snapshot.segmentId));
       if (verdict) children.push(el("div", `hn-verdict ${verdict.className}`, verdict.text));
     }
@@ -124,6 +96,8 @@ export class EditPanelBox {
       );
     }
 
-    container.replaceChildren(...children);
+    const box = el("div", "hn-pane");
+    box.replaceChildren(...children);
+    return box;
   }
 }

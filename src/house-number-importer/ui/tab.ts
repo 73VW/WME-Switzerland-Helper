@@ -6,7 +6,8 @@ import { LANGUAGE_CHOICES, resolveLocale, setLocale, t, type LanguagePreference 
 import { log } from "../log";
 import type { SettingsStore } from "../settings";
 import type { PointStatus } from "../status";
-import { buildSection, button, dot, el, numberInput, toggleSwitch } from "./dom";
+import { buildSection, button, el, icon, numberInput, toggleSwitch } from "../../ui/dom";
+import { STATUS_ICONS } from "../map-layer";
 import { getStreetNameVerdict } from "../../street-check-bridge";
 import {
   canBulkImport,
@@ -22,6 +23,21 @@ import { injectStyles } from "./styles";
 const MIN_ZOOM_BOUNDS = { min: 15, max: 22 };
 /** Statuses worth counting in the tab; NEUTRAL is the absence of a verdict, not a count. */
 const COUNTED: PointStatus[] = ["MISSING", "PRESENT", "OTHER_STREET"];
+
+/**
+ * The status marker standing next to a label; never the sole carrier of a meaning, hence
+ * the empty alt. It is the exact image the map draws, so a pill can never drift from the
+ * point it stands for.
+ *
+ * Lives here rather than in the shared builders because it reads this feature's own
+ * STATUS_ICONS, and rather than in ui/format.ts because that module holds no DOM.
+ */
+function dot(status: PointStatus): HTMLElement {
+  const img = el("img", "hn-dot");
+  img.src = STATUS_ICONS[status];
+  img.alt = "";
+  return img;
+}
 
 /**
  * The dedicated sidebar tab: master switch, state, counts, bulk import, settings, legend.
@@ -88,27 +104,34 @@ export class TabUI {
     const pane = el("div", "hn-pane");
 
     const brand = el("div", "hn-brand");
-    brand.append(el("span", "hn-brand-icon", "🏠"), el("span", "hn-brand-title", t("appName")));
+    brand.append(icon("home", "hn-brand-icon"), el("span", "hn-brand-title", t("appName")));
+
+    // The master switch rides on the title line, as in the street-name tab.
+    // Short label, like the street-name tab: the panel title beside it already says what
+    // is being enabled. The full sentence stays as the tooltip.
+    const enabledToggle = toggleSwitch(
+      "hn",
+      t("enable"),
+      settings.enabled,
+      (checked) => this.onEnabledChange(checked),
+      t("enableTitle"),
+    );
+    enabledToggle.classList.add("hn-brand-switch");
+    this.enabledInput = enabledToggle.querySelector("input");
+    brand.appendChild(enabledToggle);
 
     this.banner.replaceChildren(this.bannerText);
-    const master = el("div", "hn-master");
-    const enabledToggle = toggleSwitch(t("enable"), settings.enabled, (checked) =>
-      this.onEnabledChange(checked),
-    );
-    this.enabledInput = enabledToggle.querySelector("input");
-    master.appendChild(enabledToggle);
 
+    // Five blocks, matching the street-name tab one for one. `warning` is a sibling of the
+    // banner rather than a face of it: a data caveat shows alongside the state, not
+    // instead of it, and it stays hidden while empty.
     pane.append(
       brand,
-      el("div", "hn-note", t("tabNote")),
       this.banner,
-      master,
       this.warning,
       this.selection,
       this.actionRow,
-      this.secondaryActions(),
       this.settingsSection(),
-      this.legendSection(),
     );
     this.tabPane.replaceChildren(pane);
   }
@@ -174,7 +197,7 @@ export class TabUI {
     if (verdict) {
       const line = el("div", `hn-verdict ${verdict.className}`);
       line.append(
-        el("span", "", verdict.className === "hn-verdict-ok" ? "✓" : "⚠️"),
+        icon(verdict.className === "hn-verdict-ok" ? "checkmark" : "warning"),
         el("span", "", verdict.text),
       );
       children.push(line);
@@ -205,8 +228,9 @@ export class TabUI {
       button(
         t("btnRefreshExisting"),
         () => void this.controller.refresh({ refetchExisting: true }),
+        "hn-btn",
       ),
-      button(t("btnClearCache"), () => void this.controller.reload()),
+      button(t("btnClearCache"), () => void this.controller.reload(), "hn-btn"),
     );
     return row;
   }
@@ -246,17 +270,23 @@ export class TabUI {
     });
     languageRow.append(el("span", "", t("settingsLanguage")), select);
 
-    return buildSection("⚙️", t("settingsTitle"), [
+    return buildSection("hn", "settings", t("settingsAndHelp"), [
+      // What the feature is. It used to be the tab's second block, permanently on screen;
+      // unlike the street-name checker, this feature has no note in the main sidebar, so
+      // dropping it would leave a first-time editor with nothing explaining the tab.
+      el("div", "hn-note", t("tabNote")),
+      this.secondaryActions(),
       zoomRow,
-      toggleSwitch(t("settingsShowLabels"), settings.showMapLabels, (showMapLabels) => {
+      toggleSwitch("hn", t("settingsShowLabels"), settings.showMapLabels, (showMapLabels) => {
         this.settings.update({ showMapLabels });
         void this.controller.refresh();
       }),
-      toggleSwitch(t("settingsStrictMatch"), settings.strictMatching, (strictMatching) => {
+      toggleSwitch("hn", t("settingsStrictMatch"), settings.strictMatching, (strictMatching) => {
         this.settings.update({ strictMatching });
         void this.controller.refresh();
       }),
       toggleSwitch(
+        "hn",
         t("settingsExistingOnly"),
         settings.existingBuildingsOnly,
         (existingBuildingsOnly) => {
@@ -266,23 +296,16 @@ export class TabUI {
         },
       ),
       toggleSwitch(
+        "hn",
         t("settingsConfirmSingle"),
         settings.confirmSingleImport,
         (confirmSingleImport) => this.settings.update({ confirmSingleImport }),
       ),
       languageRow,
+      // The pills carry the legend already, with a counter on top. This only covers the
+      // statuses the current selection happens not to contain.
+      el("div", "hn-note", t("legendNote")),
     ]);
-  }
-
-  private legendSection(): HTMLElement {
-    const legend = el("div", "hn-legend");
-    for (const status of Object.keys(LEGEND_KEYS) as PointStatus[]) {
-      const row = el("div", "hn-legend-row");
-      row.append(dot(status), el("span", "", t(LEGEND_KEYS[status])));
-      legend.appendChild(row);
-    }
-    // Open by default: it is four lines, and it is what makes the map readable at a glance.
-    return buildSection("🎨", t("legendTitle"), [legend], true);
   }
 
   /**

@@ -28,6 +28,38 @@ export const LEGEND_KEYS: Record<IssueStatus, StringKey> = {
   UNNAMED_NO_MATCH: "legendUNNAMED_NO_MATCH",
 };
 
+/**
+ * Short label per status, for the filter pills, the group headers and the edit-panel box.
+ *
+ * The enum name used to be shown directly — a pill read `WRONG_STREET 3` — which is debug
+ * output, not an interface. LEGEND_KEYS keeps the long explanation, now shown inside the
+ * group it concerns, where it is read at the moment it is useful.
+ *
+ * Keep these to a couple of words: they sit in a pill next to a dot and a counter, in a
+ * sidebar 310px wide. A test holds them under 24 characters in all four languages.
+ */
+export const LABEL_KEYS: Record<IssueStatus, StringKey> = {
+  COSMETIC: "labelCOSMETIC",
+  VARIANT: "labelVARIANT",
+  NEAR: "labelNEAR",
+  WRONG_TYPE: "labelWRONG_TYPE",
+  BILINGUAL: "labelBILINGUAL",
+  WRONG_STREET: "labelWRONG_STREET",
+  WRONG_CITY: "labelWRONG_CITY",
+  NOT_FOUND: "labelNOT_FOUND",
+  UNNAMED: "labelUNNAMED",
+  UNNAMED_NO_MATCH: "labelUNNAMED_NO_MATCH",
+  UNDER_LOCK: "labelUNDER_LOCK",
+  OVER_LOCK: "labelOVER_LOCK",
+  MICRO_SEGMENT: "labelMICRO_SEGMENT",
+  LOOP: "labelLOOP",
+  NARROW_MISUSE: "labelNARROW_MISUSE",
+};
+
+export function statusLabel(status: IssueStatus): string {
+  return t(LABEL_KEYS[status]);
+}
+
 export const STATE_KEYS: Record<ScanSnapshot["state"], StringKey> = {
   idle: "stateIdle",
   disabled: "stateDisabled",
@@ -46,10 +78,6 @@ export const STATE_KEYS: Record<ScanSnapshot["state"], StringKey> = {
 
 /** Leading emoji for a status, or "" when none. WRONG_STREET is flagged: a different
  *  official street runs under a validly-named segment, easy to miss in the list. */
-export function statusEmoji(status: IssueStatus): string {
-  return status === "WRONG_STREET" ? "⚠️" : "";
-}
-
 export function formatNote(note: IssueNote | null): string {
   if (!note) return "";
   const parts: string[] = [];
